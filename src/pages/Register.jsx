@@ -1,0 +1,208 @@
+"use client"
+
+import { use, useState } from "react"
+import { Users, EyeOff, Eye, IndianRupee, Lock, Smartphone } from "lucide-react"
+import { Link, useSearchParams, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import useGetuser from "../hooks/user"
+import { useEffect } from "react"
+
+const Register = () => {
+    const user = useGetuser();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams()
+    const [formData, setFormData] = useState({
+        name: "",
+        phonenumber: "",
+        password: "",
+        referral_code: searchParams.get("refcode") || ""
+    });
+
+    const [showPassword, setShowPassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
+    useEffect(() => {
+        if (user) {
+            navigate("/dashboard");
+        }
+    }, [user, navigate])
+
+    const handleInputChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        })
+    }
+
+    // Handle registration (signup)
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const response = await axios.post("http://localhost/yogabackend/api/signup", {
+                name: formData.name,
+                phonenumber: formData.phonenumber,
+                password: formData.password,
+                referral_code: formData.referral_code || ""
+            });
+
+            if (response.status === 201 && response.data.success) {
+                toast.success("Registration successful! Please login.", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+                setTimeout(() => {
+                    navigate("/login");
+                }, 1500);
+            } else {
+                toast.error("Registration failed. Please try again.", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+            }
+        } catch (error) {
+            console.error("Registration error:", error);
+            toast.error("Error during registration. Please try again later.", {
+                position: "top-right",
+                autoClose: 3000,
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen ">
+            <div className="max-w-md mx-auto px-4 py-8 bg-gradient-to-br from-green-100 via-white to-blue-50">
+                {/* Logo */}
+                <div className="mb-8 text-center">
+                    <img
+                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/png-logo-j9moV4DkAQHKCtbAK5mKGOyrYzxFGO.png"
+                        alt="Yoga For Nation Logo"
+                        className="h-40 mx-auto drop-shadow-md"
+                    />
+                </div>
+
+                {/* Main Heading */}
+                <div className="mb-8 text-center">
+                    {/* <div className="inline-block bg-gradient-to-r from-green-400 to-blue-400 text-white px-4 py-1 rounded-full text-sm font-semibold mb-3">
+                        14-DAY ONLINE PROGRAM
+                    </div> */}
+                    <h1 className="text-3xl font-bold text-green-700 mb-2">FREE YOGA</h1>
+                    <div className="flex items-center justify-center">
+                        <div className="w-6 h-0.5 bg-green-500 mr-2"></div>
+                        <p className="text-lg text-blue-600 font-medium">Daily Morning Sessions</p>
+                        <div className="w-6 h-0.5 bg-green-500 ml-2"></div>
+                    </div>
+                </div>
+
+
+                {/* Registration Form */}
+                <div className="bg-white rounded-2xl shadow-xl p-6 border border-green-100">
+                    <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">Welcome Back</h3>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Name Input */}
+                        <div className="relative">
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="Your Name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                className="block w-full pl-4 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-2"
+                                required
+                            />
+                        </div>
+
+                        {/* phonenumber Input */}
+                        <div className="relative">
+                            <div className="flex">
+                                <span className="px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100">
+                                    <span>
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg" alt="" className="inline-block h-4 mr-1 -translate-y-0.5 rounded-sm" />
+                                        +91
+                                    </span>
+                                </span>
+                                <input
+                                    type="tel"
+                                    name="phonenumber"
+                                    placeholder="WhatsApp Number"
+                                    value={formData.phonenumber || ""}
+                                    onChange={handleInputChange}
+                                    className="flex-1 block w-full  pl-2 py-3 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password Input */}
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Lock className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="Enter Your Password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                className="block w-full pl-10 pr-10 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                required
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                {showPassword ?
+                                    <Eye
+                                        className="h-5 w-5 text-gray-400 cursor-pointer hover:text-green-500"
+                                        onClick={() => setShowPassword(false)}
+                                    /> :
+                                    <EyeOff
+                                        className="h-5 w-5 text-gray-400 cursor-pointer hover:text-green-500"
+                                        onClick={() => setShowPassword(true)}
+                                    />
+                                }
+                            </div>
+                        </div>
+
+                        {/* Forgot Password Link */}
+                        <div className="text-right">
+                            <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-700">
+                                Forgot Password?
+                            </Link>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        >
+                            {isLoading ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                    Registering...
+                                </div>
+                            ) : (
+                                "Register"
+                            )}
+                        </button>
+                    </form>
+
+                    {/* Sign Up Link */}
+                    <div className="mt-6 text-center text-gray-600 border-t border-gray-100 pt-4">
+                        <p>Already have an account? <Link to="/login" className="text-green-500 font-semibold hover:text-green-600">Log in</Link></p>
+                    </div>
+                </div>
+
+                {/* Footer Note */}
+                <p className="text-xs text-gray-500 mt-6 text-center">
+                    By continuing, you agree to our Terms of Service and Privacy Policy
+                </p>
+            </div>
+            <ToastContainer />
+        </div>
+    )
+}
+
+export default Register
