@@ -1,96 +1,370 @@
-"use client"
-
-
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
-
+import { useState, useEffect } from "react";
+import { BarChart3, Users, DollarSign, Video, Clock, FileText, HelpCircle, Calendar, Filter, Eye, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAdminAuth } from "../contexts/AdminAuthContext";
 
 export default function AdminDashboard() {
-  // Sample data for charts
-  const attendanceData = [
-    { day: "Mon", attendance: 30 },
-    { day: "Tue", attendance: 45 },
-    { day: "Wed", attendance: 60 },
-    { day: "Thu", attendance: 50 },
-    { day: "Fri", attendance: 70 },
-    { day: "Sat", attendance: 85 },
-    { day: "Sun", attendance: 75 },
-  ]
+  const { getToken } = useAdminAuth();
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [filterType, setFilterType] = useState("all");
 
-  const userStatusData = [
-    { name: "Active", value: 400, color: "#6366f1" },
-    { name: "Inactive", value: 100, color: "#e5e7eb" },
-  ]
+  const classTypes = ["Beginner", "Intermediate", "Advanced", "All Levels"];
 
-  const topClasses = ["Morning Vinyasa Flow", "Advanced Power Yoga", "Evening Restorative Yoga"]
+  // Quick links for admin navigation
+  const quickLinks = [
+    { 
+      title: "User Management", 
+      description: "Manage user accounts and permissions", 
+      icon: Users, 
+      href: "/admin/users",
+      color: "bg-blue-500"
+    },
+    { 
+      title: "Live Classes", 
+      description: "Schedule and manage yoga classes", 
+      icon: Video, 
+      href: "/admin/classes",
+      color: "bg-green-500"
+    },
+    { 
+      title: "Financials", 
+      description: "View financial reports and analytics", 
+      icon: DollarSign, 
+      href: "/admin/financials",
+      color: "bg-yellow-500"
+    },
+    { 
+      title: "Resources", 
+      description: "Manage diet plans and resources", 
+      icon: FileText, 
+      href: "/admin/resources",
+      color: "bg-purple-500"
+    },
+    { 
+      title: "Instructions", 
+      description: "Manage batch timings and instructions", 
+      icon: Clock, 
+      href: "/admin/batches",
+      color: "bg-indigo-500"
+    },
+    { 
+      title: "FAQs", 
+      description: "Manage frequently asked questions", 
+      icon: HelpCircle, 
+      href: "/admin/faqs",
+      color: "bg-pink-500"
+    }
+  ];
 
-  const topDietPlans = ["7-Day Detox Plan", "High-Protein Yogi Diet"]
+  // Fetch all classes
+  const fetchClasses = async () => {
+    try {
+      setLoading(true);
+      const token = getToken();
+      
+      if (!token) {
+        toast.error("Authentication required");
+        return;
+      }
+
+      console.log("🔍 Fetching classes for dashboard...");
+
+      const response = await axios.get(
+        "http://localhost/yogabackend/api/classes",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      console.log("✅ Classes response:", response.data);
+
+      if (response.data.success) {
+        setClasses(response.data.classes || []);
+      } else {
+        toast.error(response.data.message || "Failed to fetch classes");
+      }
+
+    } catch (error) {
+      console.error("❌ Error fetching classes:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error("Failed to fetch classes. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter classes by date and type
+  const filteredClasses = classes.filter(classItem => {
+    const dateMatch = !selectedDate || classItem.class_date === selectedDate;
+    const typeMatch = filterType === "all" || classItem.class_type === filterType;
+    return dateMatch && typeMatch;
+  });
+
+  // Format time display
+  const formatTime = (time) => {
+    if (!time) return "";
+    const [hours, minutes] = time.split(':');
+    const hour = parseInt(hours);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+    return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  // Format date display
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  // Get class type color
+  const getTypeColor = (type) => {
+    switch (type) {
+      case 'Beginner':
+        return 'text-green-800 bg-green-100';
+      case 'Intermediate':
+        return 'text-yellow-800 bg-yellow-100';
+      case 'Advanced':
+        return 'text-red-800 bg-red-100';
+      case 'All Levels':
+        return 'text-blue-800 bg-blue-100';
+      default:
+        return 'text-gray-800 bg-gray-100';
+    }
+  };
+
+  // Get today's date for default filter
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  useEffect(() => {
+    fetchClasses();
+    // Set today's date as default
+    setSelectedDate(getTodayDate());
+  }, []);
 
   return (
-    
-      <div className="space-y-6">
-        {/* Daily Attendance Trends */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Daily Attendance Trends</h2>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={attendanceData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Bar dataKey="attendance" fill="#6366f1" />
-              </BarChart>
-            </ResponsiveContainer>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+          <p className="text-gray-600">Manage classes, view attendance, and access admin tools</p>
+        </div>
+
+        {/* Quick Links */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Access</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {quickLinks.map((link, index) => (
+              <Link
+                key={index}
+                to={link.href}
+                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center">
+                    <div className={`${link.color} p-3 rounded-lg text-white mr-4`}>
+                      <link.icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                        {link.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">{link.description}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Active vs Inactive Users */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Active vs. Inactive Users</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={userStatusData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value">
-                    {userStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="text-center text-2xl font-bold text-gray-800">400</div>
+        {/* Class Attendance Section */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">Class Attendance Overview</h2>
+            <p className="text-gray-600 mt-1">Filter and view attendance for scheduled classes</p>
           </div>
 
-          {/* Most Popular */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Most Popular</h2>
+          {/* Filters */}
+          <div className="p-6 border-b border-gray-200 bg-gray-50">
+            <div className="flex gap-4 items-center flex-wrap">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-500" />
+                <label htmlFor="dateFilter" className="text-sm font-medium text-gray-700">Date:</label>
+                <input
+                  type="date"
+                  id="dateFilter"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
 
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-700 mb-3">Top Classes</h3>
-              <ul className="space-y-2">
-                {topClasses.map((className, index) => (
-                  <li key={index} className="flex items-center text-gray-600">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full mr-3"></span>
-                    {className}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <label htmlFor="typeFilter" className="text-sm font-medium text-gray-700">Type:</label>
+                <select
+                  id="typeFilter"
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="all">All Types</option>
+                  {classTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <h3 className="text-lg font-medium text-gray-700 mb-3">Top Diet Plans</h3>
-              <ul className="space-y-2">
-                {topDietPlans.map((plan, index) => (
-                  <li key={index} className="flex items-center text-gray-600">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full mr-3"></span>
-                    {plan}
-                  </li>
-                ))}
-              </ul>
+              <button
+                onClick={fetchClasses}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                Refresh Data
+              </button>
             </div>
           </div>
+
+          {/* Classes List */}
+          <div className="p-6">
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-gray-600 mt-2">Loading classes...</p>
+              </div>
+            ) : filteredClasses.length === 0 ? (
+              <div className="text-center py-12">
+                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No classes found for the selected filters</p>
+                <p className="text-sm text-gray-500 mt-1">Try adjusting your date or class type filter</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredClasses.map((classItem) => (
+                  <div key={classItem.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="font-semibold text-gray-900">{classItem.title}</h3>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(classItem.class_type)}`}>
+                            {classItem.class_type}
+                          </span>
+                        </div>
+                        
+                        <p className="text-gray-600 mb-3">{classItem.description}</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <span className="text-gray-500">Date:</span>
+                            <p className="font-medium">{formatDate(classItem.class_date)}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Time:</span>
+                            <p className="font-medium">
+                              {formatTime(classItem.start_time)} - {formatTime(classItem.end_time)}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Instructor:</span>
+                            <p className="font-medium">{classItem.instructor}</p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Location:</span>
+                            <p className="font-medium">{classItem.location}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-right ml-6">
+                        <div className="text-lg font-bold text-gray-900">
+                          {classItem.total_attendees || 0} / {classItem.max_participants}
+                        </div>
+                        <div className="text-sm text-gray-500 mb-2">Attendees</div>
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{
+                              width: `${Math.min(((classItem.total_attendees || 0) / classItem.max_participants) * 100, 100)}%`
+                            }}
+                          ></div>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {Math.round(((classItem.total_attendees || 0) / classItem.max_participants) * 100)}% filled
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Summary Stats */}
+          {filteredClasses.length > 0 && (
+            <div className="p-6 border-t border-gray-200 bg-gray-50">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">{filteredClasses.length}</div>
+                  <div className="text-sm text-gray-600">Total Classes</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {filteredClasses.reduce((sum, cls) => sum + (cls.total_attendees || 0), 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Attendees</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {filteredClasses.reduce((sum, cls) => sum + cls.max_participants, 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">Total Capacity</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">
+                    {Math.round((filteredClasses.reduce((sum, cls) => sum + (cls.total_attendees || 0), 0) / 
+                                filteredClasses.reduce((sum, cls) => sum + cls.max_participants, 0)) * 100) || 0}%
+                  </div>
+                  <div className="text-sm text-gray-600">Avg. Occupancy</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
-    
-  )
+    </div>
+  );
 }

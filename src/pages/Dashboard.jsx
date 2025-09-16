@@ -31,6 +31,9 @@ export default function Dashboard() {
   const [classesLoading, setClassesLoading] = useState(false)
   const [classesError, setClassesError] = useState(false)
   const [joiningClass, setJoiningClass] = useState(null)
+  const [leaderboard, setLeaderboard] = useState(null)
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false)
+  const [leaderboardError, setLeaderboardError] = useState(false)
 
 
   useEffect(() => {
@@ -41,6 +44,7 @@ export default function Dashboard() {
       fetchInstructions();
       fetchWeeklyAttendance();
       fetchTodaysClasses();
+      fetchLeaderboard();
     }
 
     // Check if navigation came from profile edit with resetToHome state
@@ -276,6 +280,53 @@ export default function Dashboard() {
       setJoiningClass(null);
     }
   }
+
+  const fetchLeaderboard = async () => {
+    try {
+      setLeaderboardLoading(true);
+      setLeaderboardError(false);
+
+      const response = await axios.get("http://localhost/yogabackend/api/attendance/leaderboard/streak", {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.data.success) {
+        setLeaderboard(response.data.leaderboard);
+      } else {
+        setLeaderboardError(true);
+        toast.error("Failed to load leaderboard");
+      }
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      setLeaderboardError(true);
+      if (error.response?.status === 404) {
+        console.warn("Leaderboard endpoint not found");
+      } else if (error.code === 'NETWORK_ERROR' || !error.response) {
+        toast.error("Network error. Please check your connection.");
+      } else {
+        toast.error("Failed to load leaderboard. Please try again later.");
+      }
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  }
+
+  // Yoga progression levels based on classes attended
+  const getYogaLevel = (classesAttended) => {
+    if (classesAttended >= 500) return { title: "Mahayogi (महायोगी)", sanskrit: "महायोगी", classes: "500+ classes", color: "bg-gradient-to-r from-purple-600 to-pink-600" };
+    if (classesAttended >= 365) return { title: "Yogi (योगी)", sanskrit: "योगी", classes: "365 classes", color: "bg-gradient-to-r from-indigo-600 to-purple-600" };
+    if (classesAttended >= 250) return { title: "Yogacharya (योगाचार्य)", sanskrit: "योगाचार्य", classes: "250 classes", color: "bg-gradient-to-r from-blue-600 to-indigo-600" };
+    if (classesAttended >= 180) return { title: "Yogaratna (योगरत्न)", sanskrit: "योगरत्न", classes: "180 days consistent", color: "bg-gradient-to-r from-cyan-600 to-blue-600" };
+    if (classesAttended >= 100) return { title: "Yogapravar (योगप्रवर)", sanskrit: "योगप्रवर", classes: "100 classes", color: "bg-gradient-to-r from-teal-600 to-cyan-600" };
+    if (classesAttended >= 75) return { title: "Dhyanvi (ध्यानवी)", sanskrit: "ध्यानवी", classes: "75 classes", color: "bg-gradient-to-r from-green-600 to-teal-600" };
+    if (classesAttended >= 50) return { title: "Pranamitra (प्राणमित्र)", sanskrit: "प्राणमित्र", classes: "50 classes", color: "bg-gradient-to-r from-lime-600 to-green-600" };
+    if (classesAttended >= 30) return { title: "Yogasarthi (योगार्थी)", sanskrit: "योगार्थी", classes: "30-40 classes", color: "bg-gradient-to-r from-yellow-600 to-lime-600" };
+    if (classesAttended >= 10) return { title: "Abhyasi (अभ्यासी)", sanskrit: "अभ्यासी", classes: "10-25 classes", color: "bg-gradient-to-r from-orange-600 to-yellow-600" };
+    if (classesAttended >= 5) return { title: "Sadhak (साधक)", sanskrit: "साधक", classes: "5-10 classes", color: "bg-gradient-to-r from-red-600 to-orange-600" };
+    return { title: "Beginner", sanskrit: "नवागत", classes: "0-4 classes", color: "bg-gradient-to-r from-gray-600 to-red-600" };
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -736,11 +787,125 @@ export default function Dashboard() {
           )}
         </div>
 
+        {/* Leaderboard Section */}
+        <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
+          <h3 className="font-semibold text-gray-800 mb-4">🏆 Yoga Leaderboard</h3>
 
-
-
-
-
+          {leaderboardLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          ) : leaderboardError ? (
+            <div className="text-center py-6">
+              <p className="text-gray-500">Unable to load leaderboard</p>
+              <button 
+                onClick={fetchLeaderboard}
+                className="mt-2 text-blue-600 text-sm hover:text-blue-700"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : leaderboard && leaderboard.length > 0 ? (
+            <div className="space-y-3">
+              {leaderboard.slice(0, 5).map((user, index) => {
+                const level = getYogaLevel(parseInt(user.total_classes_attended));
+                const isCurrentUser = user.id === userProfile?.id;
+                
+                return (
+                  <div 
+                    key={user.id} 
+                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                      isCurrentUser ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                        index === 0 ? 'bg-yellow-500' : 
+                        index === 1 ? 'bg-gray-400' : 
+                        index === 2 ? 'bg-orange-500' : 
+                        'bg-blue-500'
+                      }`}>
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
+                      </div>
+                      
+                      <div>
+                        <p className={`font-medium ${isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
+                          {user.name} {isCurrentUser ? '(You)' : ''}
+                        </p>
+                        <div className="flex items-center space-x-2">
+                          <span className={`text-xs px-2 py-1 rounded-full text-white ${level.color}`}>
+                            {level.sanskrit}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {level.classes}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-right">
+                      <p className="font-bold text-lg text-gray-800">
+                        {user.total_classes_attended}
+                      </p>
+                      <p className="text-xs text-gray-500">classes</p>
+                      <p className="text-xs text-green-600 font-medium">
+                        {user.attendance_rate}% rate
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Current User Level Display */}
+              {userProfile && (
+                <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                  <h4 className="font-medium text-gray-800 mb-2">Your Yoga Journey</h4>
+                  {(() => {
+                    const userLevel = getYogaLevel(parseInt(userProfile.total_classes_attended || 0));
+                    const nextLevelThresholds = [5, 10, 30, 50, 75, 100, 180, 250, 365, 500];
+                    const currentClasses = parseInt(userProfile.total_classes_attended || 0);
+                    const nextThreshold = nextLevelThresholds.find(threshold => threshold > currentClasses);
+                    const classesNeeded = nextThreshold ? nextThreshold - currentClasses : 0;
+                    
+                    return (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`px-3 py-1 rounded-full text-white text-sm ${userLevel.color}`}>
+                            {userLevel.title}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {currentClasses} classes completed
+                          </span>
+                        </div>
+                        
+                        {nextThreshold && (
+                          <div>
+                            <div className="flex justify-between text-xs text-gray-600 mb-1">
+                              <span>Progress to next level</span>
+                              <span>{classesNeeded} classes to go</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
+                                style={{ 
+                                  width: `${Math.min((currentClasses / nextThreshold) * 100, 100)}%` 
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-gray-500">No leaderboard data available</p>
+            </div>
+          )}
+        </div>
 
       </>
     )

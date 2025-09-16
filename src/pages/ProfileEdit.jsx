@@ -185,6 +185,23 @@ const ProfileEdit = () => {
                     <div className="bg-white rounded-lg p-4 shadow-sm">
                         <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
                             <User className="w-4 h-4" />
+                            User Id
+                        </label>
+                        <input
+                            type="text"
+                            name="user_id"
+                            value={formData.user_id}
+                            onChange={handleInputChange}
+                            placeholder="Enter your user ID"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                            readOnly
+                        />
+                    </div>
+                    {/* Name */}
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
+                            <User className="w-4 h-4" />
                             Name
                         </label>
                         <input

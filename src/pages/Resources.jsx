@@ -154,7 +154,7 @@ export default function Resources() {
       const response = await axios.get("http://localhost/yogabackend/api/video-resources");
       
       if (response.data.success) {
-        setVideos(response.data.videos || []);
+        setVideos(response.data.video_resources || []);
       } else {
         console.warn("Videos API returned success: false");
         setVideos([]);
