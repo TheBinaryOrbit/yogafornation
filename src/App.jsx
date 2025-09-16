@@ -4,6 +4,7 @@ import LandingPage from './pages/LandingPage'
 import NotFound from './pages/NotFound'
 import Dashboard from './pages/Dashboard'
 import Resources from './pages/Resources'
+import Donations from './pages/Donations'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminLayout from './components/AdminLayout'
@@ -17,40 +18,79 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ProfileEdit from './pages/ProfileEdit'
 import { DashboardProvider } from './contexts/DashboardContext'
-
+import { AdminAuthProvider } from './contexts/AdminAuthContext'
+import AdminProtectedRoute from './components/AdminProtectedRoute'
+import AddVideoResources from './pages/VideoResources'
 function App() {
   return (
-    <Routes>
-      
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
-      <Route path='/dashboard' element={
-        <DashboardProvider>
-          <Dashboard />
-        </DashboardProvider>
-      } />
-      <Route path='/profile-edit' element={
-        <DashboardProvider>
-          <ProfileEdit />
-        </DashboardProvider>
-      } />
-      <Route path="/resources" element={<Resources />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
+    <AdminAuthProvider>
+      <Routes>
+        
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path='/dashboard' element={
+          <DashboardProvider>
+            <Dashboard />
+          </DashboardProvider>
+        } />
+        <Route path='/profile-edit' element={
+          <DashboardProvider>
+            <ProfileEdit />
+          </DashboardProvider>
+        } />
+        <Route path='/donations' element={<Donations />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
 
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="resources" element={<ResourceManagement />} />
-        <Route path="batches" element={<BatchTimings />} />
-        <Route path='financials' element={<FinancialsPage />} />
-        <Route path='classes' element={<LiveClassesPage />} />
-        <Route path='faqs' element={<AddFAQs />} />
-      </Route>
+        <Route path="/admin" element={
+          <AdminProtectedRoute>
+            <AdminLayout />
+          </AdminProtectedRoute>
+        }>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={
+            <AdminProtectedRoute requiredPermission="manage_users">
+              <UserManagement />
+            </AdminProtectedRoute>
+          } />
+          <Route path="resources" element={
+            <AdminProtectedRoute requiredPermission="manage_resources">
+              <ResourceManagement />
+            </AdminProtectedRoute>
+          } />
+          <Route path="batches" element={
+            <AdminProtectedRoute requiredPermission="manage_classes">
+              <BatchTimings />
+            </AdminProtectedRoute>
+          } />
+          <Route path='financials' element={
+            <AdminProtectedRoute requiredPermission="view_analytics">
+              <FinancialsPage />
+            </AdminProtectedRoute>
+          } />
+          <Route path='classes' element={
+            <AdminProtectedRoute requiredPermission="manage_classes">
+              <LiveClassesPage />
+            </AdminProtectedRoute>
+          } />
+          <Route path='faqs' element={
+            <AdminProtectedRoute requiredPermission="manage_resources">
+              <AddFAQs />
+            </AdminProtectedRoute>
+          } />
 
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+          <Route path='video' element={
+            <AdminProtectedRoute requiredPermission="manage_resources">
+            <AddVideoResources />
+            </AdminProtectedRoute>
+          } />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AdminAuthProvider>
   )
 }
 

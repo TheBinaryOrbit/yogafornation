@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3 } from "lucide-react"
+import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart } from "lucide-react"
 import Resources from "./Resources"
 import useGetuser from "../hooks/user"
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom"
@@ -813,6 +813,17 @@ export default function Dashboard() {
               >
                 <BookOpen className="w-5 h-5 text-gray-600" />
                 <span className="text-gray-700">Resources</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  navigate("/donations");
+                  setSidebarOpen(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <Heart className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-700">Donations</span>
               </button>
 
               <button

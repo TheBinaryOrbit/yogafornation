@@ -1,85 +1,279 @@
 "use client"
 
-import { useState } from "react"
-import { DollarSign, TrendingUp, Download, CreditCard, QrCode, Check, X, Eye, Clock } from "lucide-react"
+import { useState, useEffect } from "react"
+import { DollarSign, Download, Check, X, Eye, ChevronLeft, ChevronRight, TrendingUp, Clock } from "lucide-react"
+import axios from "axios"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import { useAdminAuth } from "../contexts/AdminAuthContext"
 
 export default function FinancialsPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState("monthly")
-  const [activeTab, setActiveTab] = useState("overview")
-  const [selectedQRPayment, setSelectedQRPayment] = useState(null)
+  const { getToken } = useAdminAuth()
+  const [loading, setLoading] = useState(false)
+  const [totalDonation, setTotalDonation] = useState(0);
+  const [totalApproved, setTotalApproved] = useState(0);
 
-  const monthlyData = [
-    { month: "Jan", donations: 2100, subscriptions: 2800, total: 4900 },
-    { month: "Feb", donations: 1950, subscriptions: 3100, total: 5050 },
-    { month: "Mar", donations: 2300, subscriptions: 3200, total: 5500 },
-    { month: "Apr", donations: 2150, subscriptions: 3400, total: 5550 },
-    { month: "May", donations: 2400, subscriptions: 3600, total: 6000 },
-    { month: "Jun", donations: 2200, subscriptions: 3800, total: 6000 },
-  ]
+  // Core state
+  const [donations, setDonations] = useState([])
+  const [donationStats, setDonationStats] = useState({})
+  const [pagination, setPagination] = useState({})
 
-  const recentTransactions = [
-    { id: 1, type: "Subscription", user: "Sarah Johnson", amount: 29.99, date: "2024-01-15", status: "Completed" },
-    { id: 2, type: "Donation", user: "Mike Chen", amount: 50.0, date: "2024-01-15", status: "Completed" },
-    { id: 3, type: "Subscription", user: "Lisa Rodriguez", amount: 19.99, date: "2024-01-14", status: "Completed" },
-    { id: 4, type: "Donation", user: "Anonymous", amount: 25.0, date: "2024-01-14", status: "Completed" },
-    { id: 5, type: "Subscription", user: "David Kim", amount: 29.99, date: "2024-01-13", status: "Failed" },
-  ]
+  // Modal states
+  const [selectedDonation, setSelectedDonation] = useState(null)
+  const [showApprovalModal, setShowApprovalModal] = useState(false)
+  const [showRejectionModal, setShowRejectionModal] = useState(false)
+  const [showScreenshotModal, setShowScreenshotModal] = useState(false)
 
-  const pendingQRPayments = [
-    {
-      id: 1,
-      user: "Rahul Sharma",
-      amount: 500,
-      date: "2024-01-15",
-      time: "14:30",
-      transactionId: "QR123456789",
-      screenshot: "/generic-payment-screenshot.png",
-      status: "pending",
-    },
-    {
-      id: 2,
-      user: "Priya Patel",
-      amount: 1000,
-      date: "2024-01-15",
-      time: "12:15",
-      transactionId: "QR987654321",
-      screenshot: "/generic-payment-screenshot.png",
-      status: "pending",
-    },
-    {
-      id: 3,
-      user: "Anonymous",
-      amount: 250,
-      date: "2024-01-14",
-      time: "18:45",
-      transactionId: "QR456789123",
-      screenshot: "/generic-payment-screenshot.png",
-      status: "pending",
-    },
-  ]
 
-  const handleQRPaymentAction = (paymentId, action) => {
-    console.log(`${action} payment ${paymentId}`)
-    alert(`Payment ${action}d successfully!`)
+  useEffect(() => {
+    let total = 0;
+    let approved = 0;
+    donations.map((donation) => {
+      if (donation.status === "approved") {
+        approved++;
+        total = total + parseInt(donation.amount);
+      }
+    })
+    setTotalDonation(total);
+    setTotalApproved(approved);
+  }, [donations])
+
+  // Form states
+  const [rejectionReason, setRejectionReason] = useState("")
+
+  // Simplified filters
+  const [filters, setFilters] = useState({
+    status: "",
+    page: 1,
+    limit: 20
+  })
+
+  // Fetch donations
+  const fetchDonations = async () => {
+    try {
+      setLoading(true)
+      const token = getToken()
+
+      if (!token) {
+        toast.error("Authentication required")
+        return
+      }
+
+      const params = new URLSearchParams()
+      Object.keys(filters).forEach(key => {
+        if (filters[key]) {
+          params.append(key, filters[key])
+        }
+      })
+
+      const response = await axios.get(
+        `http://localhost/yogabackend/api/admin/donations?${params.toString()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      )
+
+      if (response.data.success) {
+        setDonations(response.data.donations || [])
+        setPagination(response.data.pagination || {})
+        setDonationStats(response.data.stats || {})
+      } else {
+        toast.error(response.data.message || "Failed to fetch donations")
+      }
+
+    } catch (error) {
+      console.error("Error fetching donations:", error)
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.")
+      } else {
+        toast.error("Failed to fetch donations. Please try again.")
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const financialData = {
-    totalRevenue: 45680,
-    donations: 12340,
-    subscriptions: 33340,
-    monthlyGrowth: 12.5,
-    activeSubscribers: 1247,
-    averageDonation: 25.5,
-    pendingQRPayments: pendingQRPayments.length,
+  // Approve donation
+  const handleApproveDonation = async (donationId) => {
+    try {
+      const token = getToken()
+
+      if (!token) {
+        toast.error("Authentication required")
+        return
+      }
+
+      console.log("✅ Approving donation:", donationId)
+
+      const response = await axios.put(
+        `http://localhost/yogabackend/api/admin/donations/${donationId}/approve`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      )
+
+      console.log("✅ Approval response:", response.data)
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Donation approved successfully")
+        
+        // Show karma points awarded info
+        if (response.data.donation_details) {
+          const details = response.data.donation_details
+          toast.info(
+            `₹${details.amount} approved. ${details.karma_points_awarded} karma points awarded to ${details.user_name}. New total: ${details.new_karma_total}`,
+            { autoClose: 5000 }
+          )
+        }
+
+        // Refresh all data
+        await fetchDonations()
+        
+      } else {
+        toast.error(response.data.message || "Failed to approve donation")
+      }
+
+    } catch (error) {
+      console.error("❌ Error approving donation:", error)
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.")
+      } else if (error.response?.status === 404) {
+        toast.error("Donation not found.")
+      } else {
+        toast.error("Failed to approve donation. Please try again.")
+      }
+    }
   }
 
+  // Reject donation
+  const handleRejectDonation = async (donationId, reason) => {
+    try {
+      const token = getToken()
+
+      if (!token) {
+        toast.error("Authentication required")
+        return
+      }
+
+      console.log("🚫 Rejecting donation:", donationId, "Reason:", reason)
+
+      const response = await axios.put(
+        `http://localhost/yogabackend/api/admin/donations/${donationId}/reject`,
+        {
+          rejection_reason: reason
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      )
+
+      console.log("✅ Rejection response:", response.data)
+
+      if (response.data.success) {
+        toast.success(response.data.message || "Donation rejected successfully")
+        
+        // Show rejection details if available
+        if (response.data.donation_details) {
+          const details = response.data.donation_details
+          toast.info(
+            `₹${details.amount} from ${details.user_name} rejected. User has been notified.`,
+            { autoClose: 5000 }
+          )
+        }
+
+        // Refresh all data
+        await fetchDonations()
+        
+      } else {
+        toast.error(response.data.message || "Failed to reject donation")
+      }
+
+    } catch (error) {
+      console.error("❌ Error rejecting donation:", error)
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.")
+      } else if (error.response?.status === 404) {
+        toast.error("Donation not found.")
+      } else {
+        toast.error("Failed to reject donation. Please try again.")
+      }
+    }
+  }
+
+  // Handle filter changes
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value,
+      page: key !== 'page' ? 1 : value
+    }))
+  }
+
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.total_pages) {
+      handleFilterChange('page', newPage)
+    }
+  }
+
+  // Modal handlers
+  const openApprovalModal = (donation) => {
+    setSelectedDonation(donation)
+    setShowApprovalModal(true)
+  }
+
+  const openRejectionModal = (donation) => {
+    setSelectedDonation(donation)
+    setRejectionReason("")
+    setShowRejectionModal(true)
+  }
+
+  const openScreenshotModal = (donation) => {
+    setSelectedDonation(donation)
+    setShowScreenshotModal(true)
+  }
+
+  const closeModals = () => {
+    setSelectedDonation(null)
+    setShowApprovalModal(false)
+    setShowRejectionModal(false)
+    setShowScreenshotModal(false)
+    setRejectionReason("")
+  }
+
+  // Status color helper
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'approved':
+        return 'text-green-800 bg-green-100'
+      case 'rejected':
+        return 'text-red-800 bg-red-100'
+      case 'pending':
+        return 'text-yellow-800 bg-yellow-100'
+      default:
+        return 'text-gray-800 bg-gray-100'
+    }
+  }
+
+
+
+
+  // Generate simple report
   const generateReport = () => {
     const reportData = {
-      period: selectedPeriod,
-      totalRevenue: financialData.totalRevenue,
-      donations: financialData.donations,
-      subscriptions: financialData.subscriptions,
-      transactions: recentTransactions,
+      generated_at: new Date().toISOString(),
+      total_donations: pagination.total_donations || 0,
+      donations: donations
     }
 
     const dataStr = JSON.stringify(reportData, null, 2)
@@ -87,412 +281,560 @@ export default function FinancialsPage() {
     const url = URL.createObjectURL(dataBlob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `financial-report-${selectedPeriod}-${new Date().toISOString().split("T")[0]}.json`
+    link.download = `donations-report-${new Date().toISOString().split("T")[0]}.json`
     link.click()
     URL.revokeObjectURL(url)
+
+    toast.success("Report downloaded successfully")
   }
 
+  // Fetch data on component mount and filter changes
+  useEffect(() => {
+    fetchDonations()
+  }, [filters])
+
   return (
-    
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Financial Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <select
-              value={selectedPeriod}
-              onChange={(e) => setSelectedPeriod(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-            <button
-              onClick={generateReport}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Generate Report
-            </button>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">Donations</h1>
+        <div className="flex items-center gap-4">
+          {/* Status Filter */}
+          {/* <select
+            value={filters.status}
+            onChange={(e) => handleFilterChange('status', e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+          </select> */}
+
+          <button
+            onClick={generateReport}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+        {/* Total Amount Card */}
+        <div className="bg-white p-6 rounded-lg shadow border">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-full">
+              <DollarSign className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Amount</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ₹ {totalDonation}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setActiveTab("overview")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === "overview"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab("qr-donations")}
-              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
-                activeTab === "qr-donations"
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <QrCode className="h-4 w-4" />
-              QR Donations
-              {financialData.pendingQRPayments > 0 && (
-                <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
-                  {financialData.pendingQRPayments}
-                </span>
-              )}
-            </button>
-          </nav>
-        </div>
-
-        {activeTab === "overview" && (
-          <>
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow-md border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">${financialData.totalRevenue.toLocaleString()}</p>
-                  </div>
-                  <div className="p-3 bg-green-100 rounded-full">
-                    <DollarSign className="h-6 w-6 text-green-600" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
-                  <span className="text-sm text-green-600">+{financialData.monthlyGrowth}% from last month</span>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Donations</p>
-                    <p className="text-2xl font-bold text-gray-900">${financialData.donations.toLocaleString()}</p>
-                  </div>
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <TrendingUp className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Avg: ${financialData.averageDonation}</span>
-                  <div className="text-xs text-gray-500">
-                    <div>QR: 60% | Razorpay: 40%</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Subscriptions</p>
-                    <p className="text-2xl font-bold text-gray-900">${financialData.subscriptions.toLocaleString()}</p>
-                  </div>
-                  <div className="p-3 bg-purple-100 rounded-full">
-                    <CreditCard className="h-6 w-6 text-purple-600" />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span className="text-sm text-gray-600">{financialData.activeSubscribers} active subscribers</span>
-                </div>
-              </div>
-
-              {/* Pending QR Payments Metric */}
-              <div className="bg-white p-6 rounded-lg shadow-md border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Pending QR Payments</p>
-                    <p className="text-2xl font-bold text-orange-600">{financialData.pendingQRPayments}</p>
-                  </div>
-                  <div className="p-3 bg-orange-100 rounded-full">
-                    <Clock className="h-6 w-6 text-orange-600" />
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <span className="text-sm text-gray-600">Awaiting approval</span>
-                </div>
-              </div>
+        {/* Total Donations Card */}
+        <div className="bg-white p-6 rounded-lg shadow border">
+          <div className="flex items-center">
+            <div className="p-3 bg-green-100 rounded-full">
+              <TrendingUp className="h-6 w-6 text-green-600" />
             </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Total Approved</p>
+              <p className="text-2xl font-bold text-gray-900">{totalApproved}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            {/* Revenue Chart */}
-            <div className="bg-white p-6 rounded-lg shadow-md border">
-              <h2 className="text-lg font-semibold mb-4">Monthly Revenue Breakdown</h2>
-              <div className="space-y-4">
-                {monthlyData.map((data, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 w-20">
-                      <span className="text-sm font-medium text-gray-700">{data.month}</span>
-                    </div>
-                    <div className="flex-1 mx-4">
-                      <div className="flex h-8 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="bg-blue-500 flex items-center justify-center text-xs text-white font-medium"
-                          style={{ width: `${(data.donations / data.total) * 100}%` }}
-                        >
-                          {data.donations > 0 && `$${data.donations}`}
+      {/* Additional Statistics Row */}
+      {donationStats.total_donations > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Success Rate */}
+          <div className="bg-white p-4 rounded-lg shadow border">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {donationStats.total_donations > 0
+                  ? `${((donationStats.approved_count / donationStats.total_donations) * 100).toFixed(1)}%`
+                  : '0%'
+                }
+              </div>
+              <p className="text-sm text-gray-600">Approval Rate</p>
+            </div>
+          </div>
+
+          {/* Payment Methods */}
+          <div className="bg-white p-4 rounded-lg shadow border">
+            <div className="text-center">
+              <div className="flex justify-center space-x-4 mb-2">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-blue-600">{donationStats.razorpay_count || 0}</div>
+                  <div className="text-xs text-gray-500">Razorpay</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-purple-600">{donationStats.qr_count || 0}</div>
+                  <div className="text-xs text-gray-500">QR Code</div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">Payment Split</p>
+            </div>
+          </div>
+
+          {/* Processing Status */}
+          <div className="bg-white p-4 rounded-lg shadow border">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">
+                {donationStats.total_donations > 0
+                  ? `${(((donationStats.approved_count + donationStats.rejected_count) / donationStats.total_donations) * 100).toFixed(1)}%`
+                  : '0%'
+                }
+              </div>
+              <p className="text-sm text-gray-600">Processed</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detailed Analytics */}
+      {donationStats.total_donations > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Categories */}
+          {donationStats.top_categories && Object.keys(donationStats.top_categories).length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow border">
+              <h3 className="text-lg font-semibold mb-4">Top Donation Categories</h3>
+              <div className="space-y-3">
+                {Object.entries(donationStats.top_categories)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([category, count], index) => {
+                    const percentage = donationStats.total_donations > 0
+                      ? ((count / donationStats.total_donations) * 100).toFixed(1)
+                      : 0
+                    return (
+                      <div key={category} className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className={`w-3 h-3 rounded-full mr-3 ${index === 0 ? 'bg-blue-500' :
+                            index === 1 ? 'bg-green-500' :
+                              index === 2 ? 'bg-yellow-500' : 'bg-gray-400'
+                            }`}></div>
+                          <span className="text-sm font-medium text-gray-700">{category}</span>
                         </div>
-                        <div
-                          className="bg-green-500 flex items-center justify-center text-xs text-white font-medium"
-                          style={{ width: `${(data.subscriptions / data.total) * 100}%` }}
-                        >
-                          {data.subscriptions > 0 && `$${data.subscriptions}`}
+                        <div className="text-right">
+                          <div className="text-sm font-semibold text-gray-900">{count} donations</div>
+                          <div className="text-xs text-gray-500">{percentage}%</div>
                         </div>
                       </div>
-                    </div>
-                    <div className="w-20 text-right">
-                      <span className="text-sm font-semibold text-gray-900">${data.total}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                  <span>Donations</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span>Subscriptions</span>
-                </div>
+                    )
+                  })
+                }
               </div>
             </div>
+          )}
 
-            {/* Recent Transactions */}
-            <div className="bg-white rounded-lg shadow-md border overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold">Recent Transactions</h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        User
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Amount
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {recentTransactions.map((transaction) => (
-                      <tr key={transaction.id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            {transaction.type === "Donation" ? (
-                              <TrendingUp className="h-4 w-4 text-blue-500" />
-                            ) : (
-                              <CreditCard className="h-4 w-4 text-green-500" />
-                            )}
-                            <span className="text-sm font-medium text-gray-900">{transaction.type}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.user}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                          ${transaction.amount}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{transaction.date}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              transaction.status === "Completed"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {transaction.status}
+          {/* Monthly Trend */}
+          {donationStats.monthly_trend && Object.keys(donationStats.monthly_trend).length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow border">
+              <h3 className="text-lg font-semibold mb-4">Monthly Revenue Trend</h3>
+              <div className="space-y-4">
+                {Object.entries(donationStats.monthly_trend)
+                  .sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime())
+                  .slice(0, 6)
+                  .map(([month, amount]) => {
+                    const formattedAmount = parseFloat(amount).toLocaleString('en-IN')
+                    const maxAmount = Math.max(...Object.values(donationStats.monthly_trend).map(val => parseFloat(val)))
+                    const percentage = maxAmount > 0 ? (parseFloat(amount) / maxAmount) * 100 : 0
+
+                    return (
+                      <div key={month} className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 w-20">
+                          <span className="text-sm font-medium text-gray-700">
+                            {new Date(month + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })}
                           </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* QR Donations Tab Content */}
-        {activeTab === "qr-donations" && (
-          <div className="space-y-6">
-            {/* Donation Methods Info */}
-            <div className="bg-white p-6 rounded-lg shadow-md border">
-              <h2 className="text-lg font-semibold mb-4">Donation Methods</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-lg">
-                  <QrCode className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <h3 className="font-medium text-gray-900">QR Code Payments</h3>
-                    <p className="text-sm text-gray-600">Manual verification required</p>
-                    <p className="text-xs text-gray-500">Users upload payment screenshots</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 p-4 bg-green-50 rounded-lg">
-                  <CreditCard className="h-8 w-8 text-green-600" />
-                  <div>
-                    <h3 className="font-medium text-gray-900">Razorpay</h3>
-                    <p className="text-sm text-gray-600">Automatic processing</p>
-                    <p className="text-xs text-gray-500">Instant confirmation</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Pending QR Payments */}
-            <div className="bg-white rounded-lg shadow-md border overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold">Pending QR Payments</h2>
-                <p className="text-sm text-gray-600">Review and approve/reject QR code payments</p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        User
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Amount
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Date & Time
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Transaction ID
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Screenshot
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {pendingQRPayments.map((payment) => (
-                      <tr key={payment.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {payment.user}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                          ₹{payment.amount}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <div>
-                            <div>{payment.date}</div>
-                            <div className="text-xs text-gray-400">{payment.time}</div>
+                        </div>
+                        <div className="flex-1 mx-4">
+                          <div className="w-full bg-gray-200 rounded-full h-4">
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-green-500 h-4 rounded-full flex items-center justify-center"
+                              style={{ width: `${Math.max(percentage, 5)}%` }}
+                            >
+                              {percentage > 20 && (
+                                <span className="text-xs text-white font-medium">₹{formattedAmount}</span>
+                              )}
+                            </div>
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">
-                          {payment.transactionId}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => setSelectedQRPayment(payment)}
-                            className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
-                          >
-                            <Eye className="h-4 w-4" />
-                            View
-                          </button>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
+                        </div>
+                        <div className="w-24 text-right">
+                          <span className="text-sm font-semibold text-gray-900">₹{formattedAmount}</span>
+                        </div>
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Quick Summary Stats */}
+      {donationStats.total_donations > 0 && (
+        <div className="bg-gradient-to-r from-blue-50 to-green-50 p-6 rounded-lg border">
+          <h3 className="text-lg font-semibold mb-4 text-gray-800">Quick Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-blue-600">
+                ₹{donationStats.average_donation ? parseFloat(donationStats.average_donation).toLocaleString('en-IN') : '0'}
+              </div>
+              <div className="text-sm text-gray-600">Avg Donation</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-green-600">
+                {donationStats.total_donations && donationStats.approved_count
+                  ? Math.round(donationStats.approved_count / donationStats.total_donations * 100)
+                  : 0
+                }%
+              </div>
+              <div className="text-sm text-gray-600">Success Rate</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-purple-600">
+                {donationStats.razorpay_count && donationStats.total_donations
+                  ? Math.round(donationStats.razorpay_count / donationStats.total_donations * 100)
+                  : 0
+                }%
+              </div>
+              <div className="text-sm text-gray-600">Razorpay</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-orange-600">
+                {donationStats.pending_count || 0}
+              </div>
+              <div className="text-sm text-gray-600">Need Review</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Donations Table */}
+      <div className="bg-white rounded-lg shadow-md border overflow-hidden">
+        {loading ? (
+          <div className="px-6 py-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading donations...</p>
+          </div>
+        ) : donations.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <DollarSign className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600">No donations found</p>
+          </div>
+        ) : <>
+          <div className="overflow-x-auto border rounded-lg shadow-sm">
+            <table className="w-full text-sm text-left text-gray-600">
+              <thead className="bg-gray-100 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10">
+                <tr>
+                  <th className="px-6 py-3">User</th>
+                  <th className="px-6 py-3">Amount</th>
+                  <th className="px-6 py-3">Status</th>
+                  <th className="px-6 py-3">Date</th>
+                  <th className="px-6 py-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 bg-white">
+                {donations.map((donation) => (
+                  <tr key={donation.id} className="hover:bg-gray-50 transition">
+                    {/* User */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="font-medium text-gray-900">{donation.user_name}</div>
+                      <div className="text-gray-500 text-xs">{donation.user?.email}</div>
+                    </td>
+
+                    {/* Amount */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-green-600 font-semibold text-base">
+                        ₹{donation.amount}
+                      </span>
+                    </td>
+
+                    {/* Status */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                          donation.status
+                        )}`}
+                      >
+                        {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
+                      </span>
+                    </td>
+
+                    {/* Date */}
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                      {new Date(donation.created_at).toLocaleDateString()}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex justify-center gap-2">
+                        {donation.status === "pending" && (
+                          <>
                             <button
-                              onClick={() => handleQRPaymentAction(payment.id, "approve")}
-                              className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 flex items-center gap-1"
+                              onClick={() => openApprovalModal(donation)}
+                              className="flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium 
+                                 bg-green-100 text-green-700 hover:bg-green-200 transition"
                             >
                               <Check className="h-4 w-4" />
                               Approve
                             </button>
                             <button
-                              onClick={() => handleQRPaymentAction(payment.id, "reject")}
-                              className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 flex items-center gap-1"
+                              onClick={() => openRejectionModal(donation)}
+                              className="flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium 
+                                 bg-red-100 text-red-700 hover:bg-red-200 transition"
                             >
                               <X className="h-4 w-4" />
                               Reject
                             </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
+                          </>
+                        )}
 
-        {/* Screenshot Modal */}
-        {selectedQRPayment && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Payment Screenshot</h3>
-                <button onClick={() => setSelectedQRPayment(null)} className="text-gray-400 hover:text-gray-600">
-                  <X className="h-6 w-6" />
+                        {donation.payment_method === "qr" && donation.screenshot_path && (
+                          <button
+                            onClick={() => openScreenshotModal(donation)}
+                            className="flex items-center gap-1 px-3 py-1 rounded-md text-xs font-medium 
+                               bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+                          >
+                            <Eye className="h-4 w-4" />
+                            View
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {pagination.total_pages > 1 && (
+            <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-between text-sm">
+              <div className="text-gray-600">
+                Page <span className="font-semibold">{pagination.current_page}</span> of{" "}
+                <span className="font-semibold">{pagination.total_pages}</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(pagination.current_page - 1)}
+                  disabled={pagination.current_page <= 1}
+                  className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 
+                     hover:bg-gray-100 disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                <span className="px-3 py-1 rounded-md bg-gray-200 font-medium">
+                  {pagination.current_page}
+                </span>
+
+                <button
+                  onClick={() => handlePageChange(pagination.current_page + 1)}
+                  disabled={pagination.current_page >= pagination.total_pages}
+                  className="p-2 rounded-md border border-gray-300 bg-white text-gray-500 
+                     hover:bg-gray-100 disabled:opacity-50"
+                >
+                  <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
+            </div>
+          )}
+        </>
+        }
+      </div>
+
+      {/* Approval Modal */}
+      {showApprovalModal && selectedDonation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Approve Donation</h3>
+              <button onClick={closeModals} className="text-gray-400 hover:text-gray-600">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
               <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-gray-600">
-                    User: <span className="font-medium">{selectedQRPayment.user}</span>
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Amount: <span className="font-medium text-green-600">₹{selectedQRPayment.amount}</span>
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Transaction ID: <span className="font-mono text-xs">{selectedQRPayment.transactionId}</span>
-                  </p>
-                </div>
-                <div>
-                  <img
-                    src={selectedQRPayment.screenshot || "/placeholder.svg"}
-                    alt="Payment Screenshot"
-                    className="w-full h-64 object-cover rounded-lg border"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      handleQRPaymentAction(selectedQRPayment.id, "approve")
-                      setSelectedQRPayment(null)
-                    }}
-                    className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 flex items-center justify-center gap-2"
-                  >
-                    <Check className="h-4 w-4" />
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleQRPaymentAction(selectedQRPayment.id, "reject")
-                      setSelectedQRPayment(null)
-                    }}
-                    className="flex-1 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 flex items-center justify-center gap-2"
-                  >
-                    <X className="h-4 w-4" />
-                    Reject
-                  </button>
-                </div>
+                <p className="text-sm text-gray-600">
+                  Approve donation of <span className="font-medium text-green-600">₹{selectedDonation.amount}</span> from <span className="font-medium">{selectedDonation.user_name}</span>?
+                </p>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    handleApproveDonation(selectedDonation.id)
+                    closeModals()
+                  }}
+                  className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 flex items-center justify-center gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Approve
+                </button>
+                <button
+                  onClick={closeModals}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    
+        </div>
+      )}
+
+      {/* Rejection Modal */}
+      {showRejectionModal && selectedDonation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Reject Donation</h3>
+              <button onClick={closeModals} className="text-gray-400 hover:text-gray-600">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Reject donation of <span className="font-medium text-green-600">₹{selectedDonation.amount}</span> from <span className="font-medium">{selectedDonation.user_name}</span>?
+                </p>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Reason for rejection</label>
+                  <textarea
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    placeholder="Please provide a reason for rejection..."
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows={3}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    console.log("🔴 Reject button clicked")
+                    console.log("Rejection reason:", rejectionReason)
+                    console.log("Selected donation:", selectedDonation)
+                    
+                    if (rejectionReason.trim()) {
+                      handleRejectDonation(selectedDonation.id, rejectionReason)
+                      closeModals()
+                    } else {
+                      toast.error("Please provide a rejection reason")
+                    }
+                  }}
+                  className="flex-1 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!rejectionReason.trim()}
+                >
+                  <X className="h-4 w-4" />
+                  Reject
+                </button>
+                <button
+                  onClick={closeModals}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Screenshot Modal */}
+      {showScreenshotModal && selectedDonation && (
+        <div className="fixed inset-0 bg-black/30 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full h-1/2 overflow-y-auto my-10">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Payment Screenshot</h3>
+              <button onClick={closeModals} className="text-gray-400 hover:text-gray-600">
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+                  <div>
+                    <span className="font-medium text-gray-600">User:</span>
+                    <p className="text-gray-900">{selectedDonation.user_name}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Amount:</span>
+                    <p className="text-green-600 font-medium">₹{selectedDonation.amount}</p>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  {selectedDonation.screenshot_path ? (
+                    <img
+                      src={`http://localhost/yogabackend/${selectedDonation.screenshot_path}`}
+                      alt="Payment Screenshot"
+                      className="max-w-full max-h-48 object-contain rounded-lg border shadow-sm"
+                    />
+                  ) : (
+                    <div className="text-gray-500 py-8">
+                      <p>No screenshot available</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    openApprovalModal(selectedDonation)
+                    setShowScreenshotModal(false)
+                  }}
+                  className="flex-1 bg-green-600 text-white py-2 rounded-md hover:bg-green-700 flex items-center justify-center gap-2"
+                >
+                  <Check className="h-4 w-4" />
+                  Approve
+                </button>
+                <button
+                  onClick={() => {
+                    openRejectionModal(selectedDonation)
+                    setShowScreenshotModal(false)
+                  }}
+                  className="flex-1 bg-red-600 text-white py-2 rounded-md hover:bg-red-700 flex items-center justify-center gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </div>
   )
 }
