@@ -21,12 +21,13 @@ import { DashboardProvider } from './contexts/DashboardContext'
 import { AdminAuthProvider } from './contexts/AdminAuthContext'
 import AdminProtectedRoute from './components/AdminProtectedRoute'
 import AddVideoResources from './pages/VideoResources'
+import Home from './pages/Home'
 function App() {
   return (
     <AdminAuthProvider>
       <Routes>
-        
-        <Route path="/" element={<LandingPage />} />
+        <Route path='/' element={<Home />} />
+        <Route path="/landing" element={<LandingPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path='/dashboard' element={
