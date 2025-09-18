@@ -555,6 +555,7 @@ export default function Donations() {
                         {/* QR Upload Section */}
                         {paymentMethod === "qr" && (
                             <div className="mb-6">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="" className="mx-auto" />
                                 <h3 className="font-semibold text-gray-800 mb-3">Upload Payment Screenshot</h3>
                                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                                     {uploadedFile ? (

@@ -223,7 +223,9 @@ export default function Dashboard() {
     try {
       setJoiningClass(classId);
       const token = localStorage.getItem("token");
-      window.open(classLink, '_blank');
+      setTimeout(() => {
+        window.open(classLink, '_blank');
+      }, 3000);
 
       if (!token) {
         navigate("/login");
@@ -272,7 +274,9 @@ export default function Dashboard() {
         toast.error(error.response.data.message || "Invalid attendance request");
       } else if (error.response?.status === 409) {
         toast.warning("Attendance already marked for this class");
-        window.open(classLink, '_blank');
+        setTimeout(() => {
+          window.open(classLink, '_blank');
+        }, 3000);
       } else {
         toast.error("Failed to mark attendance. Please try again.");
       }
@@ -798,7 +802,7 @@ export default function Dashboard() {
           ) : leaderboardError ? (
             <div className="text-center py-6">
               <p className="text-gray-500">Unable to load leaderboard</p>
-              <button 
+              <button
                 onClick={fetchLeaderboard}
                 className="mt-2 text-blue-600 text-sm hover:text-blue-700"
               >
@@ -810,24 +814,22 @@ export default function Dashboard() {
               {leaderboard.slice(0, 5).map((user, index) => {
                 const level = getYogaLevel(parseInt(user.total_classes_attended));
                 const isCurrentUser = user.id === userProfile?.id;
-                
+
                 return (
-                  <div 
-                    key={user.id} 
-                    className={`flex items-center justify-between p-3 rounded-lg border ${
-                      isCurrentUser ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
-                    }`}
+                  <div
+                    key={user.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${isCurrentUser ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                      }`}
                   >
                     <div className="flex items-center space-x-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                        index === 0 ? 'bg-yellow-500' : 
-                        index === 1 ? 'bg-gray-400' : 
-                        index === 2 ? 'bg-orange-500' : 
-                        'bg-blue-500'
-                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${index === 0 ? 'bg-yellow-500' :
+                          index === 1 ? 'bg-gray-400' :
+                            index === 2 ? 'bg-orange-500' :
+                              'bg-blue-500'
+                        }`}>
                         {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
                       </div>
-                      
+
                       <div>
                         <p className={`font-medium ${isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
                           {user.name} {isCurrentUser ? '(You)' : ''}
@@ -842,7 +844,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="text-right">
                       <p className="font-bold text-lg text-gray-800">
                         {user.total_classes_attended}
@@ -855,7 +857,7 @@ export default function Dashboard() {
                   </div>
                 );
               })}
-              
+
               {/* Current User Level Display */}
               {userProfile && (
                 <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
@@ -866,7 +868,7 @@ export default function Dashboard() {
                     const currentClasses = parseInt(userProfile.total_classes_attended || 0);
                     const nextThreshold = nextLevelThresholds.find(threshold => threshold > currentClasses);
                     const classesNeeded = nextThreshold ? nextThreshold - currentClasses : 0;
-                    
+
                     return (
                       <div>
                         <div className="flex items-center justify-between mb-2">
@@ -877,7 +879,7 @@ export default function Dashboard() {
                             {currentClasses} classes completed
                           </span>
                         </div>
-                        
+
                         {nextThreshold && (
                           <div>
                             <div className="flex justify-between text-xs text-gray-600 mb-1">
@@ -885,10 +887,10 @@ export default function Dashboard() {
                               <span>{classesNeeded} classes to go</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
+                              <div
                                 className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
-                                style={{ 
-                                  width: `${Math.min((currentClasses / nextThreshold) * 100, 100)}%` 
+                                style={{
+                                  width: `${Math.min((currentClasses / nextThreshold) * 100, 100)}%`
                                 }}
                               ></div>
                             </div>

@@ -41,7 +41,7 @@ const HeroSection = () => {
 
           {/* Button */}
           <div className="mt-10">
-            <Link to="/landing">
+            <Link to="/login">
               <button
                 // navigate to login
 
