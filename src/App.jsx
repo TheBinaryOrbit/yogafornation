@@ -22,6 +22,7 @@ import { AdminAuthProvider } from './contexts/AdminAuthContext'
 import AdminProtectedRoute from './components/AdminProtectedRoute'
 import AddVideoResources from './pages/VideoResources'
 import Home from './pages/Home'
+import Sections from './pages/Sections'
 function App() {
   return (
     <AdminAuthProvider>
@@ -85,6 +86,12 @@ function App() {
           <Route path='video' element={
             <AdminProtectedRoute requiredPermission="manage_resources">
             <AddVideoResources />
+            </AdminProtectedRoute>
+          } />
+
+          <Route path='/admin/sections' element={
+            <AdminProtectedRoute requiredPermission="manage_resources">
+            <Sections />
             </AdminProtectedRoute>
           } />
         </Route>

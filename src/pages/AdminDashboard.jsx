@@ -11,9 +11,6 @@ export default function AdminDashboard() {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const [filterType, setFilterType] = useState("all");
-
-  const classTypes = ["Beginner", "Intermediate", "Advanced", "All Levels"];
 
   // Quick links for admin navigation
   const quickLinks = [
@@ -104,11 +101,10 @@ export default function AdminDashboard() {
     }
   };
 
-  // Filter classes by date and type
+  // Filter classes by date only
   const filteredClasses = classes.filter(classItem => {
     const dateMatch = !selectedDate || classItem.class_date === selectedDate;
-    const typeMatch = filterType === "all" || classItem.class_type === filterType;
-    return dateMatch && typeMatch;
+    return dateMatch;
   });
 
   // Format time display
@@ -131,22 +127,6 @@ export default function AdminDashboard() {
       month: 'short', 
       day: 'numeric' 
     });
-  };
-
-  // Get class type color
-  const getTypeColor = (type) => {
-    switch (type) {
-      case 'Beginner':
-        return 'text-green-800 bg-green-100';
-      case 'Intermediate':
-        return 'text-yellow-800 bg-yellow-100';
-      case 'Advanced':
-        return 'text-red-800 bg-red-100';
-      case 'All Levels':
-        return 'text-blue-800 bg-blue-100';
-      default:
-        return 'text-gray-800 bg-gray-100';
-    }
   };
 
   // Get today's date for default filter
@@ -221,22 +201,6 @@ export default function AdminDashboard() {
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <label htmlFor="typeFilter" className="text-sm font-medium text-gray-700">Type:</label>
-                <select
-                  id="typeFilter"
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">All Types</option>
-                  {classTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-
               <button
                 onClick={fetchClasses}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
@@ -268,8 +232,8 @@ export default function AdminDashboard() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-gray-900">{classItem.title}</h3>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(classItem.class_type)}`}>
-                            {classItem.class_type}
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {classItem.day_of_week}
                           </span>
                         </div>
                         
@@ -287,31 +251,40 @@ export default function AdminDashboard() {
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-500">Instructor:</span>
-                            <p className="font-medium">{classItem.instructor}</p>
+                            <span className="text-gray-500">Rating:</span>
+                            <p className="font-medium flex items-center gap-1">
+                              ⭐ {classItem.average_rating || 0} ({classItem.total_ratings || 0} reviews)
+                            </p>
                           </div>
                           <div>
-                            <span className="text-gray-500">Location:</span>
-                            <p className="font-medium">{classItem.location}</p>
+                            <span className="text-gray-500">Live Link:</span>
+                            <a 
+                              href={classItem.live_link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="font-medium text-blue-600 hover:text-blue-800 truncate block"
+                            >
+                              Join Class
+                            </a>
                           </div>
                         </div>
                       </div>
 
                       <div className="text-right ml-6">
                         <div className="text-lg font-bold text-gray-900">
-                          {classItem.total_attendees || 0} / {classItem.max_participants}
+                          {classItem.attendance_count || 0} / {classItem.max_participants}
                         </div>
                         <div className="text-sm text-gray-500 mb-2">Attendees</div>
                         <div className="w-24 bg-gray-200 rounded-full h-2">
                           <div 
                             className="bg-blue-600 h-2 rounded-full" 
                             style={{
-                              width: `${Math.min(((classItem.total_attendees || 0) / classItem.max_participants) * 100, 100)}%`
+                              width: `${Math.min(((classItem.attendance_count || 0) / classItem.max_participants) * 100, 100)}%`
                             }}
                           ></div>
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          {Math.round(((classItem.total_attendees || 0) / classItem.max_participants) * 100)}% filled
+                          {Math.round(((classItem.attendance_count || 0) / classItem.max_participants) * 100)}% filled
                         </div>
                       </div>
                     </div>
@@ -331,7 +304,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">
-                    {filteredClasses.reduce((sum, cls) => sum + (cls.total_attendees || 0), 0)}
+                    {filteredClasses.reduce((sum, cls) => sum + (cls.attendance_count || 0), 0)}
                   </div>
                   <div className="text-sm text-gray-600">Total Attendees</div>
                 </div>
@@ -343,7 +316,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-purple-600">
-                    {Math.round((filteredClasses.reduce((sum, cls) => sum + (cls.total_attendees || 0), 0) / 
+                    {Math.round((filteredClasses.reduce((sum, cls) => sum + (cls.attendance_count || 0), 0) / 
                                 filteredClasses.reduce((sum, cls) => sum + cls.max_participants, 0)) * 100) || 0}%
                   </div>
                   <div className="text-sm text-gray-600">Avg. Occupancy</div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
-import { BarChart3, Users, DollarSign, Video, Clock, FileText, HelpCircle, Menu, X, LogOut } from "lucide-react"
+import { BarChart3, Users, DollarSign, Video, Clock, FileText, HelpCircle, Menu, X, LogOut , GlobeLock } from "lucide-react"
 import { useAdminAuth } from '../contexts/AdminAuthContext'
 import { toast } from "react-toastify"
 
@@ -26,6 +26,7 @@ export default function AdminLayout() {
     { id: "resources", label: "Resources", icon: FileText, href: "/admin/resources", permission: "manage_resources" },
     { id: "faqs", label: "FAQs", icon: HelpCircle, href: "/admin/faqs", permission: "manage_resources" },
     { id: "video", label: "Video Resources", icon: HelpCircle, href: "/admin/video", permission: "manage_resources" },
+    { id: "sections", label: "Site Settings", icon: GlobeLock, href: "/admin/sections", permission: "manage_resources" },
   ]
 
   // Filter menu items based on permissions

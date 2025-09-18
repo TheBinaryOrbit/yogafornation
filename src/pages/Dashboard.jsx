@@ -1,7 +1,74 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart } from "lucide-react"
+import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart, AlignEndHorizontal, Star, HomeIcon } from "lucide-react"
+// Rating Modal Component
+function RatingModal({ open, onClose, onSubmit, classId }) {
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleStarClick = (star) => {
+    setRating(star);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!rating) return;
+    setSubmitting(true);
+    await onSubmit({ class_id: classId, rating, review });
+    setSubmitting(false);
+    setRating(0);
+    setReview("");
+    onClose();
+  };
+
+  const handleClose = () => {
+    setRating(0);
+    setReview("");
+    onClose();
+  };
+
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm relative">
+        <button className="absolute top-2 right-2 p-1" onClick={handleClose}>
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+        <h3 className="text-lg font-semibold mb-2 text-gray-800">Rate This Class</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="flex items-center mb-3">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                type="button"
+                key={star}
+                onClick={() => handleStarClick(star)}
+                className="focus:outline-none"
+              >
+                <Star className={`w-7 h-7 ${star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} fill={star <= rating ? '#facc15' : 'none'} />
+              </button>
+            ))}
+          </div>
+          <textarea
+            className="w-full border rounded-lg p-2 mb-3 text-sm"
+            rows={3}
+            placeholder="Write a review (optional)"
+            value={review}
+            onChange={e => setReview(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium disabled:opacity-60"
+            disabled={submitting || !rating}
+          >
+            {submitting ? 'Submitting...' : 'Submit Rating'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
 import Resources from "./Resources"
 import useGetuser from "../hooks/user"
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom"
@@ -11,6 +78,9 @@ import "react-toastify/dist/ReactToastify.css"
 import { useDashboard } from '../contexts/DashboardContext'
 
 export default function Dashboard() {
+  // Rating modal state
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [ratingClassId, setRatingClassId] = useState(null);
   const user = useGetuser();
   const navigate = useNavigate();
   const location = useLocation();
@@ -62,6 +132,35 @@ export default function Dashboard() {
       fetchReferralData();
     }
   }, [activeTab])
+
+  // Check for completed classes when today's classes data updates
+  useEffect(() => {
+    if (todaysClasses?.classes && userProfile) {
+      checkForCompletedClasses();
+    }
+  }, [todaysClasses, userProfile])
+
+  // Check for any classes that have ended and user attended
+  const checkForCompletedClasses = () => {
+    const now = new Date();
+    const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+
+    todaysClasses.classes.forEach(cls => {
+      // Check if class has ended and user might have attended
+      if (currentTime >= cls.end_time && cls.attendance_count > 0) {
+        // You could add additional logic here to check if user specifically attended this class
+        // For now, we'll assume if attendance is marked and class ended, show rating option
+
+        // Check if rating modal hasn't been shown for this class yet
+        const hasRatedToday = localStorage.getItem(`rated_${cls.id}_${new Date().toISOString().split('T')[0]}`);
+
+        if (!hasRatedToday && !showRatingModal) {
+          setRatingClassId(cls.id);
+          setShowRatingModal(true);
+        }
+      }
+    });
+  }
 
   const fetchUserProfile = async () => {
     try {
@@ -265,6 +364,9 @@ export default function Dashboard() {
           toast.success(`🎉 Title upgraded to: ${response.data.new_title}!`, { autoClose: 5000 });
         }
 
+        // Check if class is completed to show rating modal
+        checkAndShowRatingModal(classId);
+
       } else {
         toast.error("Failed to mark attendance");
       }
@@ -282,6 +384,77 @@ export default function Dashboard() {
       }
     } finally {
       setJoiningClass(null);
+    }
+  }
+
+  // Check if class is completed and show rating modal
+  const checkAndShowRatingModal = async (classId) => {
+    try {
+      // Find the class details from today's classes
+      const classDetails = todaysClasses?.classes?.find(cls => cls.id === classId);
+
+      if (classDetails) {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+
+        // Check if the class has ended (current time is past end time)
+        if (currentTime >= classDetails.end_time) {
+          // Class is completed, show rating modal
+          setRatingClassId(classId);
+          setShowRatingModal(true);
+        } else {
+          // Set a timeout to show rating modal when class ends
+          const endTime = new Date(`${today}T${classDetails.end_time}:00`);
+          const timeUntilEnd = endTime.getTime() - now.getTime();
+
+          if (timeUntilEnd > 0) {
+            setTimeout(() => {
+              setRatingClassId(classId);
+              setShowRatingModal(true);
+            }, timeUntilEnd);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error checking class completion:", error);
+    }
+  }
+
+  // Submit rating handler
+  const handleSubmitRating = async ({ class_id, rating, review }) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("You must be logged in to rate.");
+        return;
+      }
+      const response = await axios.post(
+        "http://localhost/yogabackend/api/user/ratings",
+        { class_id, rating, review },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      if (response.data.success) {
+        toast.success("Thank you for your feedback!");
+        setShowRatingModal(false);
+        setRatingClassId(null);
+
+        // Mark that user has rated this class today
+        localStorage.setItem(`rated_${class_id}_${new Date().toISOString().split('T')[0]}`, 'true');
+
+        // Refresh today's classes to update ratings
+        fetchTodaysClasses();
+      } else {
+        toast.error(response.data.message || "Failed to submit rating");
+      }
+    } catch (error) {
+      console.error("Error submitting rating:", error);
+      toast.error("Failed to submit rating. Please try again.");
     }
   }
 
@@ -384,6 +557,125 @@ export default function Dashboard() {
   const renderContent = () => {
     if (activeTab === "resources") {
       return <Resources />
+    }
+
+    if (activeTab === "leaderboard") {
+      return (
+        <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
+          {/* Current User Level Display */}
+          {userProfile && (
+            <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+              <h4 className="font-medium text-gray-800 mb-2">Your Yoga Journey</h4>
+              {(() => {
+                const userLevel = getYogaLevel(parseInt(userProfile.total_classes_attended || 0));
+                const nextLevelThresholds = [5, 10, 30, 50, 75, 100, 180, 250, 365, 500];
+                const currentClasses = parseInt(userProfile.total_classes_attended || 0);
+                const nextThreshold = nextLevelThresholds.find(threshold => threshold > currentClasses);
+                const classesNeeded = nextThreshold ? nextThreshold - currentClasses : 0;
+
+                return (
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className={`px-3 py-1 rounded-full text-white text-sm ${userLevel.color}`}>
+                        {userLevel.title}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {currentClasses} classes completed
+                      </span>
+                    </div>
+
+                    {nextThreshold && (
+                      <div>
+                        <div className="flex justify-between text-xs text-gray-600 mb-1">
+                          <span>Progress to next level</span>
+                          <span>{classesNeeded} classes to go</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
+                            style={{
+                              width: `${Math.min((currentClasses / nextThreshold) * 100, 100)}%`
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+          <h3 className="font-semibold text-gray-800 mb-4 text-xl my-10 text-center">🏆 Yoga Leaderboard</h3>
+          {leaderboardLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          ) : leaderboardError ? (
+            <div className="text-center py-6">
+              <p className="text-gray-500">Unable to load leaderboard</p>
+              <button
+                onClick={fetchLeaderboard}
+                className="mt-2 text-blue-600 text-sm hover:text-blue-700"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : leaderboard && leaderboard.length > 0 ? (
+            <div className="space-y-3">
+              {leaderboard.slice(0, 20).map((user, index) => {
+                const level = getYogaLevel(parseInt(user.total_classes_attended));
+                const isCurrentUser = user.id === userProfile?.id;
+
+                return (
+                  <div
+                    key={user.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${isCurrentUser ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+                      }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${index === 0 ? 'bg-yellow-500' :
+                        index === 1 ? 'bg-gray-400' :
+                          index === 2 ? 'bg-orange-500' :
+                            'bg-blue-500'
+                        }`}>
+                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
+                      </div>
+
+                      <div>
+                        <p className={`font-medium ${isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
+                          {user.name} {isCurrentUser ? '(You)' : ''}
+                        </p>
+                        <div className="flex items-center space-x-2">
+                          <span className={`text-xs px-2 py-1 rounded-full text-white ${level.color}`}>
+                            {level.sanskrit}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {level.classes}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="font-bold text-lg text-gray-800">
+                        {user.total_classes_attended}
+                      </p>
+                      <p className="text-xs text-gray-500">classes</p>
+
+                    </div>
+                  </div>
+                );
+              })}
+
+
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <p className="text-gray-500">No leaderboard data available</p>
+            </div>
+          )}
+        </div>
+      )
     }
 
     if (activeTab === "referral") {
@@ -524,140 +816,6 @@ export default function Dashboard() {
 
 
 
-        {/* Today's Classes */}
-        <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="font-semibold text-gray-800 mb-4">Today's Classes</h3>
-
-          {classesLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            </div>
-          ) : classesError ? (
-            <div className="text-center py-6">
-              <p className="text-red-600 mb-3">Failed to load today's classes</p>
-              <button
-                onClick={fetchTodaysClasses}
-                className="text-blue-600 text-sm font-medium hover:text-blue-700"
-              >
-                Retry
-              </button>
-            </div>
-          ) : todaysClasses && todaysClasses.classes.length > 0 ? (
-            <>
-              {/* Classes Summary */}
-              <div className="bg-blue-50 p-3 rounded-lg mb-4">
-                <p className="text-sm text-blue-800 font-medium">
-                  {todaysClasses.day_name}, {new Date(todaysClasses.date).toLocaleDateString()}
-                </p>
-                <p className="text-xs text-blue-700">
-                  {todaysClasses.total_classes} class{todaysClasses.total_classes !== 1 ? 'es' : ''} scheduled
-                </p>
-              </div>
-
-              {/* Classes List */}
-              <div className="space-y-3">
-                {todaysClasses.classes.map((cls) => (
-                  <div key={cls.id} className="border rounded-lg p-3 bg-gray-50">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800">{cls.title}</h4>
-                        <p className="text-sm text-gray-600">{cls.description}</p>
-                      </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${cls.is_ongoing
-                        ? 'bg-green-100 text-green-800'
-                        : cls.is_upcoming_today
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
-                        }`}>
-                        {cls.time_status}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          <span>{cls.start_time.slice(0, 5)} - {cls.end_time.slice(0, 5)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="w-4 h-4" />
-                          <span>{cls.attendance_count}/{cls.max_participants}</span>
-                        </div>
-                      </div>
-                      {cls.average_rating && (
-                        <div className="flex items-center gap-1">
-                          <span>⭐ {cls.average_rating.toFixed(1)}</span>
-                          <span className="text-xs">({cls.total_ratings})</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Join Button */}
-                    {(cls.is_ongoing || cls.is_upcoming_today) && cls.live_link && (
-                      <button
-                        onClick={() => markAttendance(cls.id, cls.live_link)}
-                        disabled={joiningClass === cls.id}
-                        className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium text-sm transition-colors ${joiningClass === cls.id
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : cls.is_ongoing
-                            ? 'bg-green-600 text-white hover:bg-green-700'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                          }`}
-                      >
-                        {joiningClass === cls.id ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                            Joining...
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4" />
-                            {cls.is_ongoing ? 'Join Now' : 'Join Class'}
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-6">
-              <p className="text-gray-500 mb-2">No classes scheduled for today</p>
-              <p className="text-xs text-gray-400">Check back tomorrow for new classes!</p>
-            </div>
-          )}
-        </div>
-
-
-        <div className="mx-4 mb-6 rounded-2xl bg-yellow-50 p-[1px] shadow-lg">
-
-          {/* Today's Instruction */}
-          <div className="rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              <p className="text-xs font-medium text-gray-600">
-                Today's Focus - {todayInstruction?.day_name || new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-              </p>
-            </div>
-
-            {instructionsLoading ? (
-              <div className="flex items-center justify-center py-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-              </div>
-            ) : todayInstruction ? (
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {todayInstruction.instruction}
-              </p>
-            ) : (
-              <p className="text-sm text-gray-400 italic">
-                No instruction available for today
-              </p>
-            )}
-          </div>
-
-        </div>
-
         {/* Weekly Attendance Tracking */}
         <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
           <h3 className="font-semibold text-gray-800 mb-4">Attendance</h3>
@@ -713,13 +871,11 @@ export default function Dashboard() {
               {/* Weekly Calendar */}
               <div className="mb-4">
                 <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2">
-                  <div className="font-medium text-gray-600 p-2">Mon</div>
-                  <div className="font-medium text-gray-600 p-2">Tue</div>
-                  <div className="font-medium text-gray-600 p-2">Wed</div>
-                  <div className="font-medium text-gray-600 p-2">Thu</div>
-                  <div className="font-medium text-gray-600 p-2">Fri</div>
-                  <div className="font-medium text-gray-600 p-2">Sat</div>
-                  <div className="font-medium text-gray-600 p-2">Sun</div>
+                  {
+                    weeklyAttendance.weekly_calendar.map((d) => (
+                      <div className="font-medium text-gray-600 p-2">{d.day_name.slice(0, 3)}</div>
+                    ))
+                  }
                 </div>
 
                 <div className="grid grid-cols-7 gap-1 text-center text-xs">
@@ -791,123 +947,182 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Leaderboard Section */}
-        <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="font-semibold text-gray-800 mb-4">🏆 Yoga Leaderboard</h3>
 
-          {leaderboardLoading ? (
+        <div className="mx-4 mb-6 rounded-2xl bg-yellow-50 p-[1px] shadow-lg">
+
+          {/* Today's Instruction */}
+          <div className="rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <p className="text-xs font-medium text-gray-600">
+                Today's Focus - {todayInstruction?.day_name || new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+              </p>
+            </div>
+
+            {instructionsLoading ? (
+              <div className="flex items-center justify-center py-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+              </div>
+            ) : todayInstruction ? (
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {todayInstruction.instruction}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-400 italic">
+                No instruction available for today
+              </p>
+            )}
+          </div>
+
+        </div>
+
+
+        {/* Today's Classes */}
+        <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
+          <h3 className="font-semibold text-gray-800 mb-4">Today's Classes</h3>
+
+          {classesLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
             </div>
-          ) : leaderboardError ? (
+          ) : classesError ? (
             <div className="text-center py-6">
-              <p className="text-gray-500">Unable to load leaderboard</p>
+              <p className="text-red-600 mb-3">Failed to load today's classes</p>
               <button
-                onClick={fetchLeaderboard}
-                className="mt-2 text-blue-600 text-sm hover:text-blue-700"
+                onClick={fetchTodaysClasses}
+                className="text-blue-600 text-sm font-medium hover:text-blue-700"
               >
-                Try Again
+                Retry
               </button>
             </div>
-          ) : leaderboard && leaderboard.length > 0 ? (
-            <div className="space-y-3">
-              {leaderboard.slice(0, 5).map((user, index) => {
-                const level = getYogaLevel(parseInt(user.total_classes_attended));
-                const isCurrentUser = user.id === userProfile?.id;
+          ) : todaysClasses && todaysClasses.classes.length > 0 ? (
+            <>
+              {/* Classes Summary */}
+              <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                <p className="text-sm text-blue-800 font-medium">
+                  {todaysClasses.day_name}, {new Date(todaysClasses.date).toLocaleDateString()}
+                </p>
+                <p className="text-xs text-blue-700">
+                  {todaysClasses.total_classes} class{todaysClasses.total_classes !== 1 ? 'es' : ''} scheduled
+                </p>
+              </div>
 
-                return (
-                  <div
-                    key={user.id}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${isCurrentUser ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
-                      }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${index === 0 ? 'bg-yellow-500' :
-                          index === 1 ? 'bg-gray-400' :
-                            index === 2 ? 'bg-orange-500' :
-                              'bg-blue-500'
+              {/* Classes List */}
+              <div className="space-y-3">
+                {todaysClasses.classes.map((cls) => (
+                  <div key={cls.id} className="border rounded-lg p-3 bg-gray-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800">{cls.title}</h4>
+                        <p className="text-sm text-gray-600">{cls.description}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${cls.is_ongoing
+                        ? 'bg-green-100 text-green-800'
+                        : cls.is_upcoming_today
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
                         }`}>
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
-                      </div>
-
-                      <div>
-                        <p className={`font-medium ${isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
-                          {user.name} {isCurrentUser ? '(You)' : ''}
-                        </p>
-                        <div className="flex items-center space-x-2">
-                          <span className={`text-xs px-2 py-1 rounded-full text-white ${level.color}`}>
-                            {level.sanskrit}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {level.classes}
-                          </span>
-                        </div>
-                      </div>
+                        {cls.time_status}
+                      </span>
                     </div>
 
-                    <div className="text-right">
-                      <p className="font-bold text-lg text-gray-800">
-                        {user.total_classes_attended}
-                      </p>
-                      <p className="text-xs text-gray-500">classes</p>
-                      <p className="text-xs text-green-600 font-medium">
-                        {user.attendance_rate}% rate
-                      </p>
+                    <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          <span>{cls.start_time.slice(0, 5)} - {cls.end_time.slice(0, 5)}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Users className="w-4 h-4" />
+                          <span>{cls.attendance_count}/{cls.max_participants}</span>
+                        </div>
+                      </div>
+                      {cls.average_rating && (
+                        <div className="flex items-center gap-1">
+                          <span>⭐ {cls.average_rating.toFixed(1)}</span>
+                          <span className="text-xs">({cls.total_ratings})</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Join Button and Rate Button */}
+                    <div className="space-y-2">
+                      {(cls.is_ongoing || cls.is_upcoming_today) && cls.live_link && (
+                        <button
+                          onClick={() => markAttendance(cls.id, cls.live_link)}
+                          disabled={joiningClass === cls.id}
+                          className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium text-sm transition-colors ${joiningClass === cls.id
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : cls.is_ongoing
+                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
+                        >
+                          {joiningClass === cls.id ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                              Joining...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-4 h-4" />
+                              {cls.is_ongoing ? 'Join Now' : 'Join Class'}
+                            </>
+                          )}
+                        </button>
+                      )}
+
+                      {/* Rate Class Button */}
+                      <button
+                        onClick={() => {
+                          setRatingClassId(cls.id);
+                          setShowRatingModal(true);
+                        }}
+                        className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium text-sm transition-colors bg-yellow-500 text-white hover:bg-yellow-600"
+                      >
+                        <Star className="w-4 h-4" />
+                        Rate This Class
+                      </button>
                     </div>
                   </div>
-                );
-              })}
-
-              {/* Current User Level Display */}
-              {userProfile && (
-                <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                  <h4 className="font-medium text-gray-800 mb-2">Your Yoga Journey</h4>
-                  {(() => {
-                    const userLevel = getYogaLevel(parseInt(userProfile.total_classes_attended || 0));
-                    const nextLevelThresholds = [5, 10, 30, 50, 75, 100, 180, 250, 365, 500];
-                    const currentClasses = parseInt(userProfile.total_classes_attended || 0);
-                    const nextThreshold = nextLevelThresholds.find(threshold => threshold > currentClasses);
-                    const classesNeeded = nextThreshold ? nextThreshold - currentClasses : 0;
-
-                    return (
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className={`px-3 py-1 rounded-full text-white text-sm ${userLevel.color}`}>
-                            {userLevel.title}
-                          </span>
-                          <span className="text-sm text-gray-600">
-                            {currentClasses} classes completed
-                          </span>
-                        </div>
-
-                        {nextThreshold && (
-                          <div>
-                            <div className="flex justify-between text-xs text-gray-600 mb-1">
-                              <span>Progress to next level</span>
-                              <span>{classesNeeded} classes to go</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div
-                                className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
-                                style={{
-                                  width: `${Math.min((currentClasses / nextThreshold) * 100, 100)}%`
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            </>
           ) : (
             <div className="text-center py-6">
-              <p className="text-gray-500">No leaderboard data available</p>
+              <p className="text-gray-500 mb-2">No classes scheduled for today</p>
+              <p className="text-xs text-gray-400">Check back tomorrow for new classes!</p>
             </div>
           )}
         </div>
+
+        {/* Join Telegram Community Card */}
+        <div className="mx-5 mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-2">Join Our Community</h3>
+              <p className="text-blue-100 text-sm mb-4">
+                Connect with fellow yogis, get daily tips, and stay updated with the latest yoga practices in our Telegram community.
+              </p>
+              <div className="flex items-center gap-2 text-blue-100 text-xs mb-4">
+                <Users className="w-4 h-4" />
+                <span>1000+ Active Members</span>
+              </div>
+            </div>
+
+          </div>
+          <button
+            onClick={() => window.open('https://t.me/yogafornation', '_blank')}
+            className="w-full bg-white text-blue-600 py-3 px-4 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+            </svg>
+            Join Telegram Community
+          </button>
+        </div>
+
+
 
       </>
     )
@@ -915,6 +1130,16 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 max-w-md mx-auto relative overflow-hidden">
+      {/* Rating Modal */}
+      <RatingModal
+        open={showRatingModal}
+        onClose={() => {
+          setShowRatingModal(false);
+          setRatingClassId(null);
+        }}
+        onSubmit={handleSubmitRating}
+        classId={ratingClassId}
+      />
       {/* Sidebar Overlay */}
       {sidebarOpen && (
         <div
@@ -949,6 +1174,16 @@ export default function Dashboard() {
         <div className="flex flex-col h-full">
           <div className="flex-1 p-4">
             <nav className="space-y-2">
+              <button
+                onClick={() => {
+                  navigate("/");
+                  setSidebarOpen(false);
+                }}
+                className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <HomeIcon className="w-5 h-5 text-gray-600" />
+                <span className="text-gray-700">Home</span>
+              </button>
               <button
                 onClick={() => {
                   navigate("/profile-edit");
@@ -1045,7 +1280,7 @@ export default function Dashboard() {
 
       {/* Sticky Footer Navigation */}
       <footer className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white border-t shadow-lg">
-        <div className="grid grid-cols-3">
+        <div className="grid grid-cols-4">
           <button
             onClick={() => setActiveTab("home")}
             className={`flex flex-col items-center py-3 px-2 ${activeTab === "home" ? "text-blue-600" : "text-gray-500"
@@ -1071,6 +1306,16 @@ export default function Dashboard() {
           >
             <Users className="w-5 h-5 mb-1" />
             <span className="text-xs">My Referral</span>
+          </button>
+
+
+          <button
+            onClick={() => setActiveTab("leaderboard")}
+            className={`flex flex-col items-center py-3 px-2 ${activeTab === "referral" ? "text-blue-600" : "text-gray-500"
+              }`}
+          >
+            <AlignEndHorizontal className="w-5 h-5 mb-1" />
+            <span className="text-xs">LeaderBoard</span>
           </button>
 
 
