@@ -22,7 +22,8 @@ const ProfileEdit = () => {
         city: "",
         birtyear: "",
         email: "",
-        primarygoal: ""
+        primarygoal: "",
+        phonenumber : ""
     });
 
     useEffect(() => {
@@ -61,7 +62,8 @@ const ProfileEdit = () => {
                     city: userData.city || "",
                     birtyear: userData.birtyear || "",
                     email: userData.email || "",
-                    primarygoal: userData.primarygoal || ""
+                    primarygoal: userData.primarygoal || "",
+                    phonenumber: userData.phonenumber || ""
                 });
                 
                 // Update localStorage with fresh user data
@@ -210,6 +212,22 @@ const ProfileEdit = () => {
                             value={formData.name}
                             onChange={handleInputChange}
                             placeholder="Enter your full name"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
+                            <User className="w-4 h-4" />
+                            Phone Number
+                        </label>
+                        <input
+                            type="text"
+                            name="phonenumber"
+                            value={formData.phonenumber}
+                            onChange={handleInputChange}
+                            placeholder="Enter your phone number"
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                             required
                         />

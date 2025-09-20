@@ -1,15 +1,21 @@
 import { useState, useEffect } from "react";
-import { BarChart3, Users, DollarSign, Video, Clock, FileText, HelpCircle, Calendar, Filter, Eye, ChevronRight } from "lucide-react";
+import { BarChart3, Users, DollarSign, Video, Clock, FileText, HelpCircle, Calendar, Filter, Eye, ChevronRight, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAdminAuth } from "../contexts/AdminAuthContext";
+import FavoriteClassesChart from "../components/Charts/FavoriteClassesChart";
+import ActiveUsersChart from "../components/Charts/ActiveUsersChart";
+import PlatformStatsCards from "../components/Charts/PlatformStatsCards";
+import UserStreakChart from "../components/Charts/UserStreakChart";
 
 export default function AdminDashboard() {
   const { getToken } = useAdminAuth();
   const [classes, setClasses] = useState([]);
+  const [publicStats, setPublicStats] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
 
   // Quick links for admin navigation
@@ -101,6 +107,49 @@ export default function AdminDashboard() {
     }
   };
 
+  // Fetch public stats
+  const fetchPublicStats = async () => {
+    try {
+      setStatsLoading(true);
+      const token = getToken();
+      
+      if (!token) {
+        toast.error("Authentication required");
+        return;
+      }
+
+      console.log("🔍 Fetching public stats...");
+
+      const response = await axios.get(
+        "http://localhost/yogabackend/api/admin/public-stats",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      console.log("✅ Public stats response:", response.data);
+
+      if (response.data.success) {
+        setPublicStats(response.data.data);
+      } else {
+        toast.error(response.data.message || "Failed to fetch public stats");
+      }
+
+    } catch (error) {
+      console.error("❌ Error fetching public stats:", error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error("Failed to fetch public stats. Please try again.");
+      }
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
   // Filter classes by date only
   const filteredClasses = classes.filter(classItem => {
     const dateMatch = !selectedDate || classItem.class_date === selectedDate;
@@ -137,6 +186,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchClasses();
+    fetchPublicStats();
     // Set today's date as default
     setSelectedDate(getTodayDate());
   }, []);
@@ -177,6 +227,71 @@ export default function AdminDashboard() {
               </Link>
             ))}
           </div>
+        </div>
+
+        {/* Charts and Analytics Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Analytics Dashboard</h2>
+              <p className="text-gray-600 mt-1">Platform statistics and performance metrics</p>
+            </div>
+            <button
+              onClick={fetchPublicStats}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            >
+              <TrendingUp className="h-4 w-4" />
+              Refresh Stats
+            </button>
+          </div>
+
+          {statsLoading ? (
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-gray-600 mt-2">Loading analytics...</p>
+            </div>
+          ) : publicStats ? (
+            <div className="space-y-8">
+              {/* Platform Stats Cards */}
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Platform Overview</h3>
+                <PlatformStatsCards platformStats={publicStats.platform_stats} />
+              </div>
+
+              {/* Charts Grid */}
+              <div className="">
+                {/* Favorite Classes Chart */}
+                {publicStats.favorite_classes && publicStats.favorite_classes.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Top Rated Classes</h3>
+                    <FavoriteClassesChart favoriteClasses={publicStats.favorite_classes} />
+                  </div>
+                )}
+
+                {/* Active Users Chart */}
+                {/* {publicStats.active_users && publicStats.active_users.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Active Users Distribution</h3>
+                    <ActiveUsersChart activeUsers={publicStats.active_users} />
+                  </div>
+                )} */}
+              </div>
+
+              {/* User Streak Chart - Full Width */}
+              {/* {publicStats.active_users && publicStats.active_users.length > 0 && (
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">User Activity Streaks</h3>
+                  <UserStreakChart activeUsers={publicStats.active_users} />
+                </div>
+              )} */}
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+              <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">No analytics data available</p>
+              <p className="text-sm text-gray-500 mt-1">Click "Refresh Stats" to load data</p>
+            </div>
+          )}
         </div>
 
         {/* Class Attendance Section */}

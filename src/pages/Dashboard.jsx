@@ -2,73 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart, AlignEndHorizontal, Star, HomeIcon } from "lucide-react"
-// Rating Modal Component
-function RatingModal({ open, onClose, onSubmit, classId }) {
-  const [rating, setRating] = useState(0);
-  const [review, setReview] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
-  const handleStarClick = (star) => {
-    setRating(star);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!rating) return;
-    setSubmitting(true);
-    await onSubmit({ class_id: classId, rating, review });
-    setSubmitting(false);
-    setRating(0);
-    setReview("");
-    onClose();
-  };
-
-  const handleClose = () => {
-    setRating(0);
-    setReview("");
-    onClose();
-  };
-
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm relative">
-        <button className="absolute top-2 right-2 p-1" onClick={handleClose}>
-          <X className="w-5 h-5 text-gray-500" />
-        </button>
-        <h3 className="text-lg font-semibold mb-2 text-gray-800">Rate This Class</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="flex items-center mb-3">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                type="button"
-                key={star}
-                onClick={() => handleStarClick(star)}
-                className="focus:outline-none"
-              >
-                <Star className={`w-7 h-7 ${star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} fill={star <= rating ? '#facc15' : 'none'} />
-              </button>
-            ))}
-          </div>
-          <textarea
-            className="w-full border rounded-lg p-2 mb-3 text-sm"
-            rows={3}
-            placeholder="Write a review (optional)"
-            value={review}
-            onChange={e => setReview(e.target.value)}
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium disabled:opacity-60"
-            disabled={submitting || !rating}
-          >
-            {submitting ? 'Submitting...' : 'Submit Rating'}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
 import Resources from "./Resources"
 import useGetuser from "../hooks/user"
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom"
@@ -554,6 +488,18 @@ export default function Dashboard() {
     copyToClipboard(message, "Status message copied! Now paste it as your WhatsApp status.");
   }
 
+
+  const getTime = (end_time) => {
+    const now = new Date();
+    const timeNow = now.toTimeString().slice(0, 8); 
+
+    const end = end_time.slice(0, 5);
+    const current = timeNow.slice(0, 5);
+
+    return current <= end;
+
+  }
+
   const renderContent = () => {
     if (activeTab === "resources") {
       return <Resources />
@@ -1009,21 +955,45 @@ export default function Dashboard() {
 
               {/* Classes List */}
               <div className="space-y-3">
-                {todaysClasses.classes.map((cls) => (
+                {todaysClasses.classes.filter(cls => {
+                  const now = new Date();
+                  const timeNow = now.toTimeString().slice(0, 5); // "HH:MM"
+
+                  // Convert start and end to Date objects for easier math
+                  const [startH, startM] = cls.start_time.split(":").map(Number);
+                  const [endH, endM] = cls.end_time.split(":").map(Number);
+
+                  const startDate = new Date(now);
+                  startDate.setHours(startH, startM, 0, 0);
+
+                  const endDate = new Date(now);
+                  endDate.setHours(endH + 1, endM, 0, 0); // ✅ extend end_time by +1 hr
+
+                  const currentDate = new Date(now);
+                  const [curH, curM] = timeNow.split(":").map(Number);
+                  currentDate.setHours(curH, curM, 0, 0);
+
+                  console.log("Class:", cls.title,
+                    "Start:", startDate.toTimeString().slice(0, 5),
+                    "End+1hr:", endDate.toTimeString().slice(0, 5),
+                    "Now:", currentDate.toTimeString().slice(0, 5));
+
+                  return currentDate >= startDate && currentDate <= endDate;
+                }).map((cls) => (
                   <div key={cls.id} className="border rounded-lg p-3 bg-gray-50">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
                         <h4 className="font-semibold text-gray-800">{cls.title}</h4>
                         <p className="text-sm text-gray-600">{cls.description}</p>
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${cls.is_ongoing
-                        ? 'bg-green-100 text-green-800'
-                        : cls.is_upcoming_today
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
-                        }`}>
-                        {cls.time_status}
-                      </span>
+                      {/* <span className={`px-2 py-1 rounded-full text-xs font-medium ${cls.is_ongoing
+                      ? 'bg-green-100 text-green-800'
+                      : cls.is_upcoming_today
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-gray-100 text-gray-800'
+                      }`}>
+                      {cls.time_status}
+                    </span> */}
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
@@ -1037,17 +1007,17 @@ export default function Dashboard() {
                           <span>{cls.attendance_count}/{cls.max_participants}</span>
                         </div>
                       </div>
-                      {cls.average_rating && (
-                        <div className="flex items-center gap-1">
-                          <span>⭐ {cls.average_rating.toFixed(1)}</span>
-                          <span className="text-xs">({cls.total_ratings})</span>
-                        </div>
-                      )}
+                      {/* {cls.average_rating && (
+                      <div className="flex items-center gap-1">
+                        <span>⭐ {cls.average_rating.toFixed(1)}</span>
+                        <span className="text-xs">({cls.total_ratings})</span>
+                      </div>
+                    )} */}
                     </div>
 
                     {/* Join Button and Rate Button */}
                     <div className="space-y-2">
-                      {(cls.is_ongoing || cls.is_upcoming_today) && cls.live_link && (
+                      {(getTime(cls.end_time)) && cls.live_link && (
                         <button
                           onClick={() => markAttendance(cls.id, cls.live_link)}
                           disabled={joiningClass === cls.id}
@@ -1324,4 +1294,73 @@ export default function Dashboard() {
       <ToastContainer />
     </div>
   )
+}
+
+
+// Rating Modal Component
+function RatingModal({ open, onClose, onSubmit, classId }) {
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleStarClick = (star) => {
+    setRating(star);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!rating) return;
+    setSubmitting(true);
+    await onSubmit({ class_id: classId, rating, review });
+    setSubmitting(false);
+    setRating(0);
+    setReview("");
+    onClose();
+  };
+
+  const handleClose = () => {
+    setRating(0);
+    setReview("");
+    onClose();
+  };
+
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 bg-opacity-40">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-6 relative">
+        <button className="absolute top-2 right-2 p-1" onClick={handleClose}>
+          <X className="w-5 h-5 text-gray-500" />
+        </button>
+        <h3 className="text-lg font-semibold mb-2 text-gray-800">Rate This Class</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="flex items-center mb-3">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                type="button"
+                key={star}
+                onClick={() => handleStarClick(star)}
+                className="focus:outline-none"
+              >
+                <Star className={`w-7 h-7 ${star <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} fill={star <= rating ? '#facc15' : 'none'} />
+              </button>
+            ))}
+          </div>
+          <textarea
+            className="w-full border rounded-lg p-2 mb-3 text-sm"
+            rows={3}
+            placeholder="Write a review (optional)"
+            value={review}
+            onChange={e => setReview(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium disabled:opacity-60"
+            disabled={submitting || !rating}
+          >
+            {submitting ? 'Submitting...' : 'Submit Rating'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
 }
