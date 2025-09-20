@@ -58,7 +58,7 @@ const BenefitsSection = () => {
               <ul role="list" className="mt-auto space-y-3 text-base text-gray-600">
                 {benefit.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start justify-center gap-x-3">
-                    <CheckIcon />
+                    {/* <CheckIcon /> */}
                     <span>{feature}</span>
                   </li>
                 ))}

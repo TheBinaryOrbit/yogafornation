@@ -1,38 +1,73 @@
-import React, { useState } from 'react';
-
-// ADDED: Two new questions and answers
-const faqData = [
-  {
-    question: 'What is the difference between Yoga and an Asana?',
-    answer: 'Yoga is a holistic ancient practice for the mind and body, encompassing philosophy, breathing techniques (pranayama), meditation, and ethical principles. An Asana is a specific physical posture or pose, which is just one of the eight limbs of yoga.',
-  },
-  {
-    question: 'How often should I practice yoga as a beginner?',
-    answer: 'For beginners, consistency is more important than duration. Starting with 2-3 sessions per week, even for just 20-30 minutes, is a great way to build a foundation. You can gradually increase the frequency and length as your body gets stronger and more flexible.',
-  },
-  {
-    question: 'Do I need to be flexible to start yoga?',
-    answer: 'Absolutely not! This is a common myth. Yoga is for everyone, regardless of flexibility. In fact, practicing yoga is one of the best ways to improve your flexibility safely. Our instructors always provide modifications for every fitness level.',
-  },
-  {
-    question: 'What is "Vinyasa" yoga?',
-    answer: '"Vinyasa" means "to place in a special way." Vinyasa yoga is a dynamic style where you flow from one asana to the next, linking each movement with your breath. It often feels like a smooth, continuous dance.',
-  },
-  {
-    question: 'Can yoga help with stress and anxiety?',
-    answer: 'Yes, significantly. The focus on deep, mindful breathing (pranayama) and physical postures helps activate the parasympathetic nervous system, which promotes a state of rest and calm. Regular practice can lower stress hormones and improve overall mental clarity.',
-  },
-  {
-    question: 'What should I wear for a yoga class?',
-    answer: 'Wear comfortable, breathable clothing that allows you to move freely. Stretchy fabrics are ideal. Avoid anything too baggy that might get in the way or too restrictive. Most people practice yoga barefoot.',
-  },
-  {
-    question: 'Is it normal to feel sore after practicing yoga?',
-    answer: 'Yes, it\'s completely normal to feel some muscle soreness, especially when you are new to yoga or trying new poses. This is known as Delayed Onset Muscle Soreness (DOMS) and is a sign that your muscles are getting stronger. It should subside within a day or two.',
-  },
-];
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const FaqSection = () => {
+  const [faqData, setFaqData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost/yogabackend/api/faqs');
+        
+        if (response.data.success) {
+          setFaqData(response.data.faqs);
+        } else {
+          setError('Failed to fetch FAQs');
+        }
+      } catch (err) {
+        console.error('Error fetching FAQs:', err);
+        setError('Failed to load FAQs. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFAQs();
+  }, []);
+  if (loading) {
+    return (
+      <section className="bg-white py-14 sm:py-22">
+        <div className="px-6 mx-auto max-w-7xl lg:px-8">
+          <div className="w-full mx-auto">
+            <h2 className="text-3xl font-bold leading-10 tracking-tight text-center text-gray-900">
+              Frequently asked questions
+            </h2>
+            <div className="mt-10 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+              <p className="mt-4 text-gray-600">Loading FAQs...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="bg-white py-14 sm:py-22">
+        <div className="px-6 mx-auto max-w-7xl lg:px-8">
+          <div className="w-full mx-auto">
+            <h2 className="text-3xl font-bold leading-10 tracking-tight text-center text-gray-900">
+              Frequently asked questions
+            </h2>
+            <div className="mt-10 text-center">
+              <p className="text-red-600">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="bg-white py-14 sm:py-22">
       <div className="px-6 mx-auto max-w-7xl lg:px-8">
@@ -41,11 +76,17 @@ const FaqSection = () => {
           <h2 className="text-3xl font-bold leading-10 tracking-tight text-center text-gray-900">
             Frequently asked questions
           </h2>
-          <dl className="mt-10 space-y-6 divide-y divide-gray-900/10">
-            {faqData.map((faq, index) => (
-              <FaqItem key={index} question={faq.question} answer={faq.answer} />
-            ))}
-          </dl>
+          {faqData.length > 0 ? (
+            <dl className="mt-10 space-y-6 divide-y divide-gray-900/10">
+              {faqData.map((faq) => (
+                <FaqItem key={faq.id} question={faq.question} answer={faq.answer} />
+              ))}
+            </dl>
+          ) : (
+            <div className="mt-10 text-center">
+              <p className="text-gray-600">No FAQs available at the moment.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>

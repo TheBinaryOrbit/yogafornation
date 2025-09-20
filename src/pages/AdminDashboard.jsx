@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BarChart3, Users, DollarSign, Video, Clock, FileText, HelpCircle, Calendar, Filter, Eye, ChevronRight, TrendingUp } from "lucide-react";
+import { BarChart3, Users, DollarSign, Video, Clock, FileText, HelpCircle, Calendar, Filter, Eye, ChevronRight, TrendingUp, Layout, Save, Upload } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -17,6 +17,21 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [statsLoading, setStatsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
+  
+  // Hero section state
+  const [heroData, setHeroData] = useState({
+    id: null,
+    title: "",
+    subtitle: "",
+    button_text: "",
+    member_count: "",
+    is_active: true,
+    hero_image_url: ""
+  });
+  const [heroLoading, setHeroLoading] = useState(false);
+  const [heroSaving, setHeroSaving] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
 
   // Quick links for admin navigation
   const quickLinks = [
@@ -61,6 +76,13 @@ export default function AdminDashboard() {
       icon: HelpCircle, 
       href: "/admin/faqs",
       color: "bg-pink-500"
+    },
+    { 
+      title: "Hero Section", 
+      description: "Edit homepage hero section content", 
+      icon: Layout, 
+      href: "#hero-section",
+      color: "bg-cyan-500"
     }
   ];
 
@@ -150,6 +172,156 @@ export default function AdminDashboard() {
     }
   };
 
+  // Fetch hero section data
+  const fetchHeroSection = async () => {
+    try {
+      setHeroLoading(true);
+      const response = await axios.get('http://localhost/yogabackend/api/hero-section');
+      
+      if (response.data.success && response.data.hero_section) {
+        setHeroData(response.data.hero_section);
+      }
+    } catch (error) {
+      console.error('Error fetching hero section:', error);
+      toast.error('Failed to fetch hero section data');
+    } finally {
+      setHeroLoading(false);
+    }
+  };
+
+  // Update hero section
+  const updateHeroSection = async () => {
+    try {
+      setHeroSaving(true);
+      const token = getToken();
+      
+      if (!token) {
+        toast.error("Authentication required");
+        return;
+      }
+
+      const updateData = {
+        title: heroData.title,
+        subtitle: heroData.subtitle,
+        button_text: heroData.button_text,
+        member_count: heroData.member_count,
+        is_active: heroData.is_active ? 1 : 0
+      };
+
+      const response = await axios.put(
+        `http://localhost/yogabackend/api/admin/hero-sections/${heroData.id}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Hero section updated successfully!');
+        // Refresh the data
+        fetchHeroSection();
+      } else {
+        toast.error(response.data.message || 'Failed to update hero section');
+      }
+    } catch (error) {
+      console.error('Error updating hero section:', error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error('Failed to update hero section. Please try again.');
+      }
+    } finally {
+      setHeroSaving(false);
+    }
+  };
+
+  // Upload hero section image
+  const uploadHeroImage = async () => {
+    if (!selectedImage) {
+      toast.error('Please select an image first');
+      return;
+    }
+
+    try {
+      setImageUploading(true);
+      const token = getToken();
+      
+      if (!token) {
+        toast.error("Authentication required");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('hero_image', selectedImage);
+      formData.append('title', heroData.title);
+      formData.append('member_count', heroData.member_count);
+
+      const response = await axios.post(
+        `http://localhost/yogabackend/api/admin/hero-sections/${heroData.id}/upload`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success('Hero image uploaded successfully!');
+        // Refresh the data
+        fetchHeroSection();
+        setSelectedImage(null);
+        // Clear the file input
+        const fileInput = document.getElementById('hero-image-input');
+        if (fileInput) fileInput.value = '';
+      } else {
+        toast.error(response.data.message || 'Failed to upload hero image');
+      }
+    } catch (error) {
+      console.error('Error uploading hero image:', error);
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error('Failed to upload hero image. Please try again.');
+      }
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        toast.error('Please select a valid image file (JPG, PNG, WEBP)');
+        return;
+      }
+      
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+      
+      setSelectedImage(file);
+    }
+  };
+
+  // Handle hero form input changes
+  const handleHeroInputChange = (field, value) => {
+    setHeroData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   // Filter classes by date only
   const filteredClasses = classes.filter(classItem => {
     const dateMatch = !selectedDate || classItem.class_date === selectedDate;
@@ -187,6 +359,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchClasses();
     fetchPublicStats();
+    fetchHeroSection();
     // Set today's date as default
     setSelectedDate(getTodayDate());
   }, []);
@@ -204,28 +377,55 @@ export default function AdminDashboard() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {quickLinks.map((link, index) => (
-              <Link
-                key={index}
-                to={link.href}
-                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow group"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center">
-                    <div className={`${link.color} p-3 rounded-lg text-white mr-4`}>
-                      <link.icon className="h-6 w-6" />
+            {quickLinks.map((link, index) => {
+              if (link.href === "#hero-section") {
+                return (
+                  <a
+                    key={index}
+                    href={link.href}
+                    className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow group"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center">
+                        <div className={`${link.color} p-3 rounded-lg text-white mr-4`}>
+                          <link.icon className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                            {link.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1">{link.description}</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
-                        {link.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-1">{link.description}</p>
+                  </a>
+                );
+              }
+              
+              return (
+                <Link
+                  key={index}
+                  to={link.href}
+                  className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow group"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center">
+                      <div className={`${link.color} p-3 rounded-lg text-white mr-4`}>
+                        <link.icon className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                          {link.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">{link.description}</p>
+                      </div>
                     </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
                   </div>
-                  <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600" />
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -439,6 +639,167 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Hero Section Management */}
+        <div id="hero-section" className="mb-8 mt-8">
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Hero Section Management</h2>
+                <p className="text-gray-600 mt-1">Edit the main hero section content on your homepage</p>
+              </div>
+              <button
+                onClick={updateHeroSection}
+                disabled={heroSaving}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+              >
+                {heroSaving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save Changes
+                  </>
+                )}
+              </button>
+            </div>
+
+            {heroLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Main Title
+                    </label>
+                    <input
+                      type="text"
+                      value={heroData.title || ''}
+                      onChange={(e) => handleHeroInputChange('title', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter hero section title"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Subtitle
+                    </label>
+                    <input
+                      type="text"
+                      value={heroData.subtitle || ''}
+                      onChange={(e) => handleHeroInputChange('subtitle', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter hero section subtitle"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Button Text
+                    </label>
+                    <input
+                      type="text"
+                      value={heroData.button_text || ''}
+                      onChange={(e) => handleHeroInputChange('button_text', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter button text"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Member Count
+                    </label>
+                    <input
+                      type="text"
+                      value={heroData.member_count || ''}
+                      onChange={(e) => handleHeroInputChange('member_count', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., 1.24 Crore +"
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2">
+                  <div className="flex items-center mb-4">
+                    <input
+                      type="checkbox"
+                      id="hero-active"
+                      checked={heroData.is_active}
+                      onChange={(e) => handleHeroInputChange('is_active', e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="hero-active" className="ml-2 block text-sm text-gray-900">
+                      Hero section is active
+                    </label>
+                  </div>
+
+                  {/* Image Upload Section */}
+                  <div className="border-t pt-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-medium text-gray-900">Hero Image</h3>
+                      {heroData.hero_image_url && (
+                        <div className="text-sm text-gray-600">
+                          Current image: {heroData.hero_image_url.split('/').pop()}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1">
+                        <input
+                          type="file"
+                          id="hero-image-input"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Supported: JPG, PNG, WEBP. Max size: 5MB
+                        </p>
+                      </div>
+                      
+                      <button
+                        onClick={uploadHeroImage}
+                        disabled={!selectedImage || imageUploading}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {imageUploading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4" />
+                            Upload Image
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {selectedImage && (
+                      <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm text-blue-800">
+                          Selected: {selectedImage.name} ({(selectedImage.size / 1024 / 1024).toFixed(2)} MB)
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <ToastContainer

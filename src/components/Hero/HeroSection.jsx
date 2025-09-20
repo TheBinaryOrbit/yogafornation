@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 import logo from "../../assets/logo.png";
 import yogaClassImage from "../../assets/hero-image.png";
@@ -7,9 +8,46 @@ import avatar2 from "../../assets/avatar2.png";
 import avatar3 from "../../assets/avatar3.png";
 import avatar4 from "../../assets/avatar4.png";
 import { Link } from "react-router-dom";
-import LandingPage from "../../pages/LandingPage";
 
 const HeroSection = () => {
+  const [heroData, setHeroData] = useState({
+    title: "India's First Habit Building Program",
+    subtitle: "Start your fitness journey with us",
+    button_text: "Try Free Sessions",
+    button_link: "/login",
+    trusted_text: "Trusted by",
+    member_count: "1.24 Crore +"
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHeroSection = async () => {
+      try {
+        const response = await axios.get('http://localhost/yogabackend/api/hero-section');
+        
+        if (response.data.success && response.data.hero_section) {
+          setHeroData(response.data.hero_section);
+        }
+      } catch (error) {
+        console.error('Error fetching hero section:', error);
+        // Keep default values if API fails
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHeroSection();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="relative overflow-hidden bg-white">
+        <div className="flex items-center justify-center h-96">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
+        </div>
+      </section>
+    );
+  }
   return ( 
     <section className="relative overflow-hidden bg-white">
       {/* Decorative background circle */}
@@ -31,24 +69,22 @@ const HeroSection = () => {
 
           {/* Main heading */}
           <h1 className="mt-32 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            India's First Habit Building Program
+            {heroData.title}
           </h1>
 
           {/* Subheading */}
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Start your fitness journey with us
+            {heroData.subtitle}
           </p>
 
           {/* Button */}
           <div className="mt-10">
             <Link to="/login">
               <button
-                // navigate to login
-
-                type="button" // Use type="button" for actions
-                className="inline-flex items-center justify-center px-8 py-4 text-xl font-semibold text-white transition-transform duration-200 bg-teal-500 rounded-full shadow-lg hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+                type="button"
+                className="inline-flex items-center justify-center px-8 py-4 text-xl font-semibold text-white transition-transform duration-200 bg-teal-500 rounded-full shadow-lg hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               >
-                Try Free Sessions
+                {heroData.button_text}
                 <svg
                   className="w-6 h-6 ml-3"
                   viewBox="0 0 20 20"
@@ -90,9 +126,9 @@ const HeroSection = () => {
               />
             </div>
             <p className="text-sm font-medium leading-6 text-gray-700">
-              Trusted by{" "}
+              {heroData.trusted_text}{" "}
               <strong className="font-semibold text-gray-900">
-                1.24 Crore +
+                {heroData.member_count}
               </strong>
               <br /> Global members
             </p>
@@ -103,7 +139,7 @@ const HeroSection = () => {
         <div className="relative z-10">
           <img
             className="w-full h-auto shadow-2xl rounded-xl"
-            src={yogaClassImage}
+            src={heroData.hero_image_url}
             alt="Women in a yoga class"
           />
         </div>
