@@ -100,7 +100,7 @@ export default function AdminDashboard() {
       console.log("🔍 Fetching classes for dashboard...");
 
       const response = await axios.get(
-        "http://localhost/yogabackend/api/classes",
+        "https://api.yogafornation.com/api/classes",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
       console.log("🔍 Fetching public stats...");
 
       const response = await axios.get(
-        "http://localhost/yogabackend/api/admin/public-stats",
+        "https://api.yogafornation.com/api/admin/public-stats",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
   const fetchHeroSection = async () => {
     try {
       setHeroLoading(true);
-      const response = await axios.get('http://localhost/yogabackend/api/hero-section');
+      const response = await axios.get('https://api.yogafornation.com/api/hero-section');
       
       if (response.data.success && response.data.hero_section) {
         setHeroData(response.data.hero_section);
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
       };
 
       const response = await axios.put(
-        `http://localhost/yogabackend/api/admin/hero-sections/${heroData.id}`,
+        `https://api.yogafornation.com/api/admin/hero-sections/${heroData.id}`,
         updateData,
         {
           headers: {
@@ -260,7 +260,7 @@ export default function AdminDashboard() {
       formData.append('member_count', heroData.member_count);
 
       const response = await axios.post(
-        `http://localhost/yogabackend/api/admin/hero-sections/${heroData.id}/upload`,
+        `https://api.yogafornation.com/api/admin/hero-sections/${heroData.id}/upload`,
         formData,
         {
           headers: {

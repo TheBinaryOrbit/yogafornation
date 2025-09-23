@@ -10,7 +10,7 @@ const FaqSection = () => {
     const fetchFAQs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost/yogabackend/api/faqs');
+        const response = await axios.get('https://api.yogafornation.com/api/faqs');
         
         if (response.data.success) {
           setFaqData(response.data.faqs);

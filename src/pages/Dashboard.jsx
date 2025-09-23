@@ -106,7 +106,7 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.get(`http://localhost/yogabackend/api/user?user_id=${storedUser.id}`, {
+      const response = await axios.get(`https://api.yogafornation.com/api/user?user_id=${storedUser.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -135,7 +135,7 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.get("http://localhost/yogabackend/api/user/referrals", {
+      const response = await axios.get("https://api.yogafornation.com/api/user/referrals", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
@@ -158,7 +158,7 @@ export default function Dashboard() {
   const fetchInstructions = async () => {
     try {
       setInstructionsLoading(true);
-      const response = await axios.get("http://localhost/yogabackend/api/instructions");
+      const response = await axios.get("https://api.yogafornation.com/api/instructions");
 
       if (response.data.success) {
         setInstructions(response.data.instructions);
@@ -196,7 +196,7 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.get("http://localhost/yogabackend/api/user/attendance/weekly", {
+      const response = await axios.get("https://api.yogafornation.com/api/user/attendance/weekly", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
@@ -229,7 +229,7 @@ export default function Dashboard() {
       setClassesLoading(true);
       setClassesError(false);
 
-      const response = await axios.get("http://localhost/yogabackend/api/classes/today");
+      const response = await axios.get("https://api.yogafornation.com/api/classes/today");
 
       if (response.data.success) {
         setTodaysClasses(response.data);
@@ -271,7 +271,7 @@ export default function Dashboard() {
       };
 
       const response = await axios.post(
-        "http://localhost/yogabackend/api/user/attendance/mark",
+        "https://api.yogafornation.com/api/user/attendance/mark",
         attendanceData,
         {
           headers: {
@@ -364,7 +364,7 @@ export default function Dashboard() {
         return;
       }
       const response = await axios.post(
-        "http://localhost/yogabackend/api/user/ratings",
+        "https://api.yogafornation.com/api/user/ratings",
         { class_id, rating, review },
         {
           headers: {
@@ -397,7 +397,7 @@ export default function Dashboard() {
       setLeaderboardLoading(true);
       setLeaderboardError(false);
 
-      const response = await axios.get("http://localhost/yogabackend/api/attendance/leaderboard/streak", {
+      const response = await axios.get("https://api.yogafornation.com/api/attendance/leaderboard/streak", {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -491,7 +491,7 @@ export default function Dashboard() {
 
   const getTime = (end_time) => {
     const now = new Date();
-    const timeNow = now.toTimeString().slice(0, 8); 
+    const timeNow = now.toTimeString().slice(0, 8);
 
     const end = end_time.slice(0, 5);
     const current = timeNow.slice(0, 5);
@@ -1070,10 +1070,10 @@ export default function Dashboard() {
         <div className="mx-5 mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Join Our Community</h3>
-              <p className="text-blue-100 text-sm mb-4">
+              <h3 className="text-lg font-semibold text-white mb-2">Join Our Communities</h3>
+              {/* <p className="text-blue-100 text-sm mb-4">
                 Connect with fellow yogis, get daily tips, and stay updated with the latest yoga practices in our Telegram community.
-              </p>
+              </p> */}
               <div className="flex items-center gap-2 text-blue-100 text-xs mb-4">
                 <Users className="w-4 h-4" />
                 <span>1000+ Active Members</span>
@@ -1089,6 +1089,15 @@ export default function Dashboard() {
               <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
             </svg>
             Join Telegram Community
+          </button>
+          <button
+            onClick={() => window.open('https://t.me/yogafornation', '_blank')}
+            className="w-full bg-white text-blue-600 mt-4 py-3 px-4 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+            </svg>
+            Join Whatsapp Community
           </button>
         </div>
 

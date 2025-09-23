@@ -35,7 +35,7 @@ function AddVideoResources() {
   const fetchVideoResources = async () => {
     try {
       setLoading(true)
-      const response = await fetch('http://localhost/yogabackend/api/video-resources')
+      const response = await fetch('https://api.yogafornation.com/api/video-resources')
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -101,7 +101,7 @@ function AddVideoResources() {
     try {
       setSubmitting(true)
       
-      const response = await fetch('http://localhost/yogabackend/api/admin/video-resources', {
+      const response = await fetch('https://api.yogafornation.com/api/admin/video-resources', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${adminToken}`,
@@ -165,7 +165,7 @@ function AddVideoResources() {
     }
 
     try {
-      const response = await fetch(`http://localhost/yogabackend/api/admin/video-resources?id=${id}`, {
+      const response = await fetch(`https://api.yogafornation.com/api/admin/video-resources?id=${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${adminToken}`

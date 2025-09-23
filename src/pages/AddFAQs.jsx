@@ -24,7 +24,7 @@ export default function AddFAQs() {
   const fetchFaqs = async () => {
     try {
       setLoading(true)
-      const response = await axios.get('http://localhost/yogabackend/api/faqs')
+      const response = await axios.get('https://api.yogafornation.com/api/faqs')
       
       if (response.data.success && response.data.faqs) {
         // Map API response to component format
@@ -77,7 +77,7 @@ export default function AddFAQs() {
     try {
       setSubmitting(true)
       
-      const response = await axios.post('http://localhost/yogabackend/api/admin/faqs', {
+      const response = await axios.post('https://api.yogafornation.com/api/admin/faqs', {
         question: newFaq.question.trim(),
         answer: newFaq.answer.trim(),
         category: newFaq.category,
@@ -133,7 +133,7 @@ export default function AddFAQs() {
     }
 
     try {
-      const response = await axios.delete(`http://localhost/yogabackend/api/admin/faqs?id=${id}`, {
+      const response = await axios.delete(`https://api.yogafornation.com/api/admin/faqs?id=${id}`, {
         headers: {
           'Authorization': `Bearer ${adminToken}`
         }

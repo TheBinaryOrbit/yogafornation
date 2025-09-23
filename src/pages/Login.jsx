@@ -36,7 +36,7 @@ const Login = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await axios.post("http://localhost/yogabackend/api/login", {
+            const response = await axios.post("https://api.yogafornation.com/api/login", {
                 phonenumber: formData.phonenumber,
                 password: formData.password
             });

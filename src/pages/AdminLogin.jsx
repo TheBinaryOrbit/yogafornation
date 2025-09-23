@@ -35,7 +35,7 @@ export default function AdminLogin() {
       console.log("🔐 Attempting admin login:", { username: formData.username })
 
       const response = await axios.post(
-        "http://localhost/yogabackend/api/admin/login",
+        "https://api.yogafornation.com/api/admin/login",
         {
           username: formData.username,
           password: formData.password,

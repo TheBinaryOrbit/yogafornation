@@ -62,7 +62,7 @@ export default function LiveClassesPage() {
       console.log("🔍 Fetching classes...");
 
       const response = await axios.get(
-        "http://localhost/yogabackend/api/classes",
+        "https://api.yogafornation.com/api/classes",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -116,7 +116,7 @@ export default function LiveClassesPage() {
       console.log("➕ Creating class:", formData);
 
       const response = await axios.post(
-        "http://localhost/yogabackend/api/admin/classes",
+        "https://api.yogafornation.com/api/admin/classes",
         {
           title: formData.title,
           description: formData.description,
@@ -177,7 +177,7 @@ export default function LiveClassesPage() {
       console.log("✏️ Updating class:", selectedClass.id, formData);
 
       const response = await axios.put(
-        `http://localhost/yogabackend/api/admin/classes/${selectedClass.id}`,
+        `https://api.yogafornation.com/api/admin/classes/${selectedClass.id}`,
         {
           title: formData.title,
           description: formData.description,
@@ -236,7 +236,7 @@ export default function LiveClassesPage() {
       console.log("🗑️ Deleting class:", classId);
 
       const response = await axios.delete(
-        `http://localhost/yogabackend/api/admin/classes/${classId}`,
+        `https://api.yogafornation.com/api/admin/classes/${classId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

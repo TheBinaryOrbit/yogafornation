@@ -74,7 +74,7 @@ export default function Donations() {
 
             // Fetch donation statistics
             try {
-                const statsResponse = await axios.get("http://localhost/yogabackend/api/user/donations/stats", {
+                const statsResponse = await axios.get("https://api.yogafornation.com/api/user/donations/stats", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json"
@@ -94,7 +94,7 @@ export default function Donations() {
 
             // Fetch donation history
             try {
-                const historyResponse = await axios.get("http://localhost/yogabackend/api/user/donations", {
+                const historyResponse = await axios.get("https://api.yogafornation.com/api/user/donations", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         "Content-Type": "application/json"
@@ -135,7 +135,7 @@ export default function Donations() {
             console.log("Creating donation order for amount:", donationAmount)
 
             const response = await axios.post(
-                "http://localhost/yogabackend/api/user/donations/razorpay",
+                "https://api.yogafornation.com/api/user/donations/razorpay",
                 { amount: parseInt(donationAmount) },
                 {
                     headers: {
@@ -186,7 +186,7 @@ export default function Donations() {
             console.log("🔍 Verifying payment:", paymentData)
 
             const response = await axios.post(
-                "http://localhost/yogabackend/api/user/donations/razorpay/verify",
+                "https://api.yogafornation.com/api/user/donations/razorpay/verify",
                 { ...paymentData , amount , user_id },
                 {
                     headers: {
@@ -364,7 +364,7 @@ export default function Donations() {
             formData.append('screenshot', uploadedFile)
 
             const response = await axios.post(
-                "http://localhost/yogabackend/api/user/donations/qr",
+                "https://api.yogafornation.com/api/user/donations/qr",
                 formData,
                 {
                     headers: {

@@ -28,7 +28,7 @@ const Home = () => {
   // Fetch active sections
   const fetchActiveSections = async () => {
     try {
-      const response = await axios.get('http://localhost/yogabackend/api/homepage-sections/active');
+      const response = await axios.get('https://api.yogafornation.com/api/homepage-sections/active');
       
       if (response.data.success) {
         // Sort by display_order

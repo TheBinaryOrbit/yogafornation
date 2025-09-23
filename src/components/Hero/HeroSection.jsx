@@ -23,7 +23,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchHeroSection = async () => {
       try {
-        const response = await axios.get('http://localhost/yogabackend/api/hero-section');
+        const response = await axios.get('https://api.yogafornation.com/api/hero-section');
         
         if (response.data.success && response.data.hero_section) {
           setHeroData(response.data.hero_section);
