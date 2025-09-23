@@ -23,6 +23,8 @@ import AdminProtectedRoute from './components/AdminProtectedRoute'
 import AddVideoResources from './pages/VideoResources'
 import Home from './pages/Home'
 import Sections from './pages/Sections'
+
+
 function App() {
   return (
     <AdminAuthProvider>
@@ -89,7 +91,7 @@ function App() {
             </AdminProtectedRoute>
           } />
 
-          <Route path='/admin/sections' element={
+          <Route path='sections' element={
             <AdminProtectedRoute requiredPermission="manage_resources">
             <Sections />
             </AdminProtectedRoute>
