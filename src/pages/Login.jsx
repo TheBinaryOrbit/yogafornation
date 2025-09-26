@@ -36,7 +36,7 @@ const Login = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await axios.post("https://api.yogafornation.com/api/login", {
+            const response = await axios.post("https://lightsteelblue-woodcock-286554.hostingersite.com/api/login", {
                 phonenumber: formData.phonenumber,
                 password: formData.password
             });
@@ -151,11 +151,11 @@ const Login = () => {
                         </div>
 
                         {/* Forgot Password Link */}
-                        <div className="text-right">
+                        {/* <div className="text-right">
                             <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-700">
                                 Forgot Password?
                             </Link>
-                        </div>
+                        </div> */}
 
                         {/* Submit Button */}
                         <button

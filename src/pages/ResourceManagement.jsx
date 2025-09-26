@@ -35,7 +35,7 @@ export default function ResourceManagement() {
       console.log("🔍 Fetching diet plans...")
 
       const response = await axios.get(
-        "https://api.yogafornation.com/api/admin/diet-plans",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/diet-plans",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ export default function ResourceManagement() {
       console.log("➕ Creating diet plan:", formData)
 
       const response = await axios.post(
-        "https://api.yogafornation.com/api/admin/diet-plans/upload",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/diet-plans/upload",
         formDataUpload,
         {
           headers: {
@@ -152,7 +152,7 @@ export default function ResourceManagement() {
       console.log("📤 Uploading files for plan:", planId)
 
       const response = await axios.post(
-        "https://api.yogafornation.com/api/admin/diet-plans/upload",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/diet-plans/upload",
         formDataUpload,
         {
           headers: {
@@ -192,7 +192,7 @@ export default function ResourceManagement() {
       console.log("🗑️ Deleting diet plan:", planId)
 
       const response = await axios.delete(
-        `https://api.yogafornation.com/api/admin/diet-plans?id=${planId}`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/diet-plans?id=${planId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

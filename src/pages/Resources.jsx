@@ -122,7 +122,7 @@ export default function Resources() {
     try {
       setLoadingFaqs(true);
       setErrorFaqs(false);
-      const response = await axios.get("https://api.yogafornation.com/api/faqs");
+      const response = await axios.get("https://lightsteelblue-woodcock-286554.hostingersite.com/api/faqs");
       
       if (response.data.success) {
         setFaqs(response.data.faqs || []);
@@ -151,7 +151,7 @@ export default function Resources() {
     try {
       setLoadingVideos(true);
       setErrorVideos(false);
-      const response = await axios.get("https://api.yogafornation.com/api/video-resources");
+      const response = await axios.get("https://lightsteelblue-woodcock-286554.hostingersite.com/api/video-resources");
       
       if (response.data.success) {
         setVideos(response.data.video_resources || []);
@@ -191,7 +191,7 @@ export default function Resources() {
         return;
       }
 
-      const response = await axios.get(`https://api.yogafornation.com/api/diet-plans/user?user_id=${userId}`);
+      const response = await axios.get(`https://lightsteelblue-woodcock-286554.hostingersite.com/api/diet-plans/user?user_id=${userId}`);
       
       if (response.data.success) {
         setDietPlans(response.data.diet_plans || []);

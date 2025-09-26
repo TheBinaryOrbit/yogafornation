@@ -67,7 +67,7 @@ export default function FinancialsPage() {
       })
 
       const response = await axios.get(
-        `https://api.yogafornation.com/api/admin/donations?${params.toString()}`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/donations?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ export default function FinancialsPage() {
       console.log("✅ Approving donation:", donationId)
 
       const response = await axios.put(
-        `https://api.yogafornation.com/api/admin/donations/${donationId}/approve`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/donations/${donationId}/approve`,
         {},
         {
           headers: {
@@ -165,7 +165,7 @@ export default function FinancialsPage() {
       console.log("🚫 Rejecting donation:", donationId, "Reason:", reason)
 
       const response = await axios.put(
-        `https://api.yogafornation.com/api/admin/donations/${donationId}/reject`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/donations/${donationId}/reject`,
         {
           rejection_reason: reason
         },
@@ -784,7 +784,7 @@ export default function FinancialsPage() {
                 <div className="text-center">
                   {selectedDonation.screenshot_path ? (
                     <img
-                      src={`https://api.yogafornation.com/${selectedDonation.screenshot_path}`}
+                      src={`https://lightsteelblue-woodcock-286554.hostingersite.com/${selectedDonation.screenshot_path}`}
                       alt="Payment Screenshot"
                       className="max-w-full max-h-48 object-contain rounded-lg border shadow-sm"
                     />

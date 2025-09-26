@@ -13,7 +13,7 @@ const BatchTiming = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://api.yogafornation.com/api/instructions"
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/instructions"
       );
       const data = await response.json();
 
@@ -33,7 +33,7 @@ const BatchTiming = () => {
   const updateInstruction = async (dayName, instruction) => {
     try {
       const response = await fetch(
-        "https://api.yogafornation.com/api/admin/instructions/day",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/instructions/day",
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

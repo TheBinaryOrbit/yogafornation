@@ -21,7 +21,7 @@ function Sections() {
       // For admin, we can get all sections (active and inactive) from the admin endpoint
       // If admin endpoint is not available, we'll use the homepage-sections endpoint
       try {
-        const adminResponse = await axios.get('https://api.yogafornation.com/api/admin/homepage-sections', {
+        const adminResponse = await axios.get('https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/homepage-sections', {
           headers: {
             Authorization: `Bearer ${getToken()}`,
             'Content-Type': 'application/json'
@@ -38,7 +38,7 @@ function Sections() {
       }
       
       // Fallback to homepage-sections endpoint
-      const response = await axios.get('https://api.yogafornation.com/api/homepage-sections/active');
+      const response = await axios.get('https://lightsteelblue-woodcock-286554.hostingersite.com/api/homepage-sections/active');
       
       if (response.data.success) {
         // Map to include id field if not present
@@ -92,7 +92,7 @@ function Sections() {
       }));
 
       const response = await axios.put(
-        'https://api.yogafornation.com/api/admin/homepage-sections/bulk',
+        'https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/homepage-sections/bulk',
         { updates },
         {
           headers: {

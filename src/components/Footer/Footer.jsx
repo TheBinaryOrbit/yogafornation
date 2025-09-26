@@ -3,15 +3,15 @@ import React from 'react';
 // Data for the links to keep the component clean and easy to manage
 const navigation = {
   about: [
-    { name: 'Home', href: '#' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Events', href: '#' },
+    { name: 'Home', href: '/dashboard' },
+    { name: 'Video', href: '/dashboard' },
+    { name: 'Resources', href: '/dashboard' },
   ],
   blog: [
-    { name: 'Nutrition', href: '#' },
-    { name: 'Physical', href: '#' },
-    { name: 'Mental Wellness', href: '#' },
-    { name: 'Lifestyle', href: '#' },
+    { name: 'Nutrition', href: '/dashboard' },
+    { name: 'Physical', href: '/dashboard' },
+    { name: 'Mental Wellness', href: '/dashboard' },
+    { name: 'Lifestyle', href: '/dashboard' },
   ],
   cities: [
     { name: 'Mumbai', href: '#' },
@@ -41,10 +41,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:gap-8">
           
           {/* Column 1: Company Info */}
-          <div className="space-y-8 md:col-span-2 lg:col-span-1">
+          <div className="space-y-8 md:col-span-2 lg:col-span-2">
             <div className="flex items-center space-x-2">
                 {/* Your Logo SVG or <img> tag */}
-                <svg className="w-auto h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H8v-2h3V7h2v4h3v2h-3v4h-2z" fill="white"/></svg>
+                {/* <svg className="w-auto h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H8v-2h3V7h2v4h3v2h-3v4h-2z" fill="white"/></svg> */}
                 <span className="text-2xl font-bold">Yoga For Nation</span>
             </div>
             <div className="space-y-4 text-sm leading-6 text-gray-300">

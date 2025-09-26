@@ -106,7 +106,7 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.get(`https://api.yogafornation.com/api/user?user_id=${storedUser.id}`, {
+      const response = await axios.get(`https://lightsteelblue-woodcock-286554.hostingersite.com/api/user?user_id=${storedUser.id}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -135,7 +135,7 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.get("https://api.yogafornation.com/api/user/referrals", {
+      const response = await axios.get("https://lightsteelblue-woodcock-286554.hostingersite.com/api/user/referrals", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
@@ -158,7 +158,7 @@ export default function Dashboard() {
   const fetchInstructions = async () => {
     try {
       setInstructionsLoading(true);
-      const response = await axios.get("https://api.yogafornation.com/api/instructions");
+      const response = await axios.get("https://lightsteelblue-woodcock-286554.hostingersite.com/api/instructions");
 
       if (response.data.success) {
         setInstructions(response.data.instructions);
@@ -196,7 +196,7 @@ export default function Dashboard() {
         return;
       }
 
-      const response = await axios.get("https://api.yogafornation.com/api/user/attendance/weekly", {
+      const response = await axios.get("https://lightsteelblue-woodcock-286554.hostingersite.com/api/user/attendance/weekly", {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
@@ -229,7 +229,7 @@ export default function Dashboard() {
       setClassesLoading(true);
       setClassesError(false);
 
-      const response = await axios.get("https://api.yogafornation.com/api/classes/today");
+      const response = await axios.get("https://lightsteelblue-woodcock-286554.hostingersite.com/api/classes/today");
 
       if (response.data.success) {
         setTodaysClasses(response.data);
@@ -271,7 +271,7 @@ export default function Dashboard() {
       };
 
       const response = await axios.post(
-        "https://api.yogafornation.com/api/user/attendance/mark",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/user/attendance/mark",
         attendanceData,
         {
           headers: {
@@ -364,7 +364,7 @@ export default function Dashboard() {
         return;
       }
       const response = await axios.post(
-        "https://api.yogafornation.com/api/user/ratings",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/user/ratings",
         { class_id, rating, review },
         {
           headers: {
@@ -397,7 +397,7 @@ export default function Dashboard() {
       setLeaderboardLoading(true);
       setLeaderboardError(false);
 
-      const response = await axios.get("https://api.yogafornation.com/api/attendance/leaderboard/streak", {
+      const response = await axios.get("https://lightsteelblue-woodcock-286554.hostingersite.com/api/attendance/leaderboard/streak", {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -739,16 +739,16 @@ export default function Dashboard() {
           ) : (
             <div className="text-center py-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Your list of referrals will appear here.</h3>
-              <p className="text-sm text-gray-600 mb-8">You Earn 10 Karma Point for every referral joining.</p>
+              <p className="text-sm text-gray-600 mb-8">You Earn 100 Karma Point for every referral joining.</p>
 
               {/* Yoga Illustration */}
-              <div className="flex justify-center">
+              {/* <div className="flex justify-center">
                 <img
                   src="/group-of-people-doing-yoga-poses-illustration-colo.jpg"
                   alt="People doing yoga poses"
                   className="w-72 h-48 object-contain"
                 />
-              </div>
+              </div> */}
             </div>
           )}
         </div>

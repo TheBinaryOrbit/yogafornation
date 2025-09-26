@@ -46,7 +46,7 @@ const ProfileEdit = () => {
                 return;
             }
 
-            const response = await axios.get(`https://api.yogafornation.com/api/user?user_id=${storedUser.id}`, {
+            const response = await axios.get(`https://lightsteelblue-woodcock-286554.hostingersite.com/api/user?user_id=${storedUser.id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -97,7 +97,7 @@ const ProfileEdit = () => {
                 return;
             }
 
-            const response = await axios.put("https://api.yogafornation.com/api/profile", formData, {
+            const response = await axios.put("https://lightsteelblue-woodcock-286554.hostingersite.com/api/profile", formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"

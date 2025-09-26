@@ -23,7 +23,7 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchHeroSection = async () => {
       try {
-        const response = await axios.get('https://api.yogafornation.com/api/hero-section');
+        const response = await axios.get('https://lightsteelblue-woodcock-286554.hostingersite.com/api/hero-section');
         
         if (response.data.success && response.data.hero_section) {
           setHeroData(response.data.hero_section);
@@ -68,7 +68,7 @@ const HeroSection = () => {
           </div>
 
           {/* Main heading */}
-          <h1 className="mt-32 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+          <h1 className="mt-10 sm:mt-32 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
             {heroData.title}
           </h1>
 

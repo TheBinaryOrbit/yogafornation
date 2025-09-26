@@ -62,7 +62,7 @@ export default function LiveClassesPage() {
       console.log("🔍 Fetching classes...");
 
       const response = await axios.get(
-        "https://api.yogafornation.com/api/classes",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/classes",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -116,7 +116,7 @@ export default function LiveClassesPage() {
       console.log("➕ Creating class:", formData);
 
       const response = await axios.post(
-        "https://api.yogafornation.com/api/admin/classes",
+        "https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/classes",
         {
           title: formData.title,
           description: formData.description,
@@ -177,7 +177,7 @@ export default function LiveClassesPage() {
       console.log("✏️ Updating class:", selectedClass.id, formData);
 
       const response = await axios.put(
-        `https://api.yogafornation.com/api/admin/classes/${selectedClass.id}`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/classes/${selectedClass.id}`,
         {
           title: formData.title,
           description: formData.description,
@@ -236,7 +236,7 @@ export default function LiveClassesPage() {
       console.log("🗑️ Deleting class:", classId);
 
       const response = await axios.delete(
-        `https://api.yogafornation.com/api/admin/classes/${classId}`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/classes/${classId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

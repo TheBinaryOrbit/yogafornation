@@ -50,7 +50,7 @@ export default function UserManagement() {
       console.log("🔍 Fetching users with filters:", filters)
 
       const response = await axios.get(
-        `https://api.yogafornation.com/api/admin/users?${params.toString()}`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/users?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -166,7 +166,7 @@ export default function UserManagement() {
       console.log("🗑️ Deleting user:", userId)
 
       const response = await axios.delete(
-        `https://api.yogafornation.com/api/admin/users/${userId}`,
+        `https://lightsteelblue-woodcock-286554.hostingersite.com/api/admin/users/${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

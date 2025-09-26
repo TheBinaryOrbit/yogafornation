@@ -10,7 +10,7 @@ const FaqSection = () => {
     const fetchFAQs = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('https://api.yogafornation.com/api/faqs');
+        const response = await axios.get('https://lightsteelblue-woodcock-286554.hostingersite.com/api/faqs');
         
         if (response.data.success) {
           setFaqData(response.data.faqs);
