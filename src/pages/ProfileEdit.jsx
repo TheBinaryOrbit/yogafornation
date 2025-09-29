@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Save, User, Mail, MapPin, Calendar, Target } from "lucide-react"
+import { ArrowLeft, Save, User, Mail, MapPin, Calendar, Target, Phone, Camera, Shield } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { toast, ToastContainer } from "react-toastify"
@@ -23,7 +23,7 @@ const ProfileEdit = () => {
         birtyear: "",
         email: "",
         primarygoal: "",
-        phonenumber : ""
+        phonenumber: ""
     });
 
     useEffect(() => {
@@ -31,7 +31,7 @@ const ProfileEdit = () => {
             navigate("/login");
             return;
         }
-        
+
         fetchUserProfile();
     }, []);
 
@@ -40,7 +40,7 @@ const ProfileEdit = () => {
             setFetchingProfile(true);
             const token = localStorage.getItem("token");
             const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-            
+
             if (!token || !storedUser.id) {
                 navigate("/login");
                 return;
@@ -65,7 +65,7 @@ const ProfileEdit = () => {
                     primarygoal: userData.primarygoal || "",
                     phonenumber: userData.phonenumber || ""
                 });
-                
+
                 // Update localStorage with fresh user data
                 localStorage.setItem("user", JSON.stringify(userData));
             } else {
@@ -108,7 +108,7 @@ const ProfileEdit = () => {
                 // Update localStorage with new user data
                 const updatedUser = { ...JSON.parse(localStorage.getItem("user") || "{}"), ...response.data.user };
                 localStorage.setItem("user", JSON.stringify(updatedUser));
-                
+
                 // Update form data with the response data
                 setFormData({
                     user_id: response.data.user.id,
@@ -119,12 +119,12 @@ const ProfileEdit = () => {
                     email: response.data.user.email || "",
                     primarygoal: response.data.user.primarygoal || ""
                 });
-                
+
                 toast.success("Profile updated successfully!", {
                     position: "top-right",
                     autoClose: 2000,
                 });
-                
+
                 setTimeout(() => {
                     resetToHome();
                     navigate("/dashboard");
@@ -154,197 +154,244 @@ const ProfileEdit = () => {
     const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
     return (
-        <div className="min-h-screen bg-gray-50 max-w-md mx-auto">
-            {/* Header */}
-            <header className="sticky top-0 z-50 bg-white shadow-sm border-b">
+        <div className="min-h-screen max-w-md mx-auto">
+            {/* Enhanced Header */}
+            <header className="sticky top-0 z-50 bg-white backdrop-blur-lg shadow-sm border-b border-gray-200">
                 <div className="flex items-center justify-between p-4">
-                    <button 
-                        onClick={() => {
-                           window.history.back();
-                        }}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 cursor-pointer"
+                    <button
+                        onClick={() => window.history.back()}
+                        className="flex items-center gap-2 text-gray-600 hover:text-gray-800 cursor-pointer transition-colors duration-200 p-2 rounded-lg hover:bg-gray-100"
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        <span>Back</span>
+                        <span className="font-medium">Back</span>
                     </button>
-                    <h1 className="text-lg font-semibold text-gray-800">Edit Profile</h1>
-                    <div className="w-16"></div> {/* Spacer for centering */}
+                    <div className="text-center">
+                        <h1 className="text-xl font-bold text-gray-800">
+                            Edit Profile
+                        </h1>
+                        <p className="text-xs text-gray-500 mt-1">Update your personal information</p>
+                    </div>
+                    <div className="w-16"></div>
                 </div>
             </header>
 
-            {/* Form Content */}
-            <main className="p-4 pb-20">
+
+
+            {/* Enhanced Form Content */}
+            <main className="p-6 pb-24">
                 {fetchingProfile ? (
                     <div className="flex items-center justify-center py-20">
                         <div className="text-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                            <p className="text-gray-600">Loading profile...</p>
+                            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                            <p className="text-gray-600 font-medium">Loading your profile...</p>
+                            <p className="text-sm text-gray-500 mt-2">Please wait a moment</p>
                         </div>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Name */}
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <User className="w-4 h-4" />
-                            User Id
-                        </label>
-                        <input
-                            type="text"
-                            name="user_id"
-                            value={formData.user_id}
-                            onChange={handleInputChange}
-                            placeholder="Enter your user ID"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                            readOnly
-                        />
-                    </div>
-                    {/* Name */}
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <User className="w-4 h-4" />
-                            Name
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleInputChange}
-                            placeholder="Enter your full name"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <User className="w-4 h-4" />
-                            Phone Number
-                        </label>
-                        <input
-                            type="text"
-                            name="phonenumber"
-                            value={formData.phonenumber}
-                            onChange={handleInputChange}
-                            placeholder="Enter your phone number"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                    </div>
-
-                    {/* Email */}
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <Mail className="w-4 h-4" />
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            placeholder="Enter your email address"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                    </div>
-
-                    {/* Gender */}
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <User className="w-4 h-4" />
-                            Gender
-                        </label>
-                        <select
-                            name="gender"
-                            value={formData.gender}
-                            onChange={handleInputChange}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    {/* City */}
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <MapPin className="w-4 h-4" />
-                            City
-                        </label>
-                        <input
-                            type="text"
-                            name="city"
-                            value={formData.city}
-                            onChange={handleInputChange}
-                            placeholder="Enter your city"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                    </div>
-
-                    {/* Birth Year */}
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <Calendar className="w-4 h-4" />
-                            Birth Year
-                        </label>
-                        <select
-                            name="birtyear"
-                            value={formData.birtyear}
-                            onChange={handleInputChange}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">Select Birth Year</option>
-                            {years.map(year => (
-                                <option key={year} value={year}>{year}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Primary Goal */}
-                    <div className="bg-white rounded-lg p-4 shadow-sm">
-                        <label className="flex items-center gap-2 text-gray-700 font-medium mb-2">
-                            <Target className="w-4 h-4" />
-                            Primary Goal
-                        </label>
-                        <select
-                            name="primarygoal"
-                            value={formData.primarygoal}
-                            onChange={handleInputChange}
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                            <option value="">Select Your Primary Goal</option>
-                            {goals.map(goal => (
-                                <option key={goal} value={goal}>{goal}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                    >
-                        {loading ? (
-                            <div className="flex items-center justify-center">
-                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                Updating Profile...
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Personal Information Section */}
+                        <div className="bg-white rounded-2xl shadow-lg p-1">
+                            <div className="p-4 border-b border-gray-100">
+                                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                    <User className="w-4 h-4 text-blue-500" />
+                                    Personal Information
+                                </h3>
+                                <p className="text-xs text-gray-500 mt-1">Basic details about yourself</p>
                             </div>
-                        ) : (
-                            <div className="flex items-center justify-center gap-2">
-                                <Save className="w-4 h-4" />
-                                Save Profile
+
+                            <div className="space-y-4 p-4">
+
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <User className="w-4 h-4 text-gray-400" />
+                                        User Id
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={`YNF-${formData.user_id}`}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your full name"
+                                        className="w-full p-4 border border-gray-200 bg-gray-200 rounded-xl "
+                                        required
+                                        readOnly
+
+                                    />
+                                </div>
+
+
+                                {/* Name */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <User className="w-4 h-4 text-gray-400" />
+                                        Full Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your full name"
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Phone Number */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <Phone className="w-4 h-4 text-gray-400" />
+                                        Phone Number
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        name="phonenumber"
+                                        value={formData.phonenumber}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your phone number"
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Email */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <Mail className="w-4 h-4 text-gray-400" />
+                                        Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your email address"
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                    />
+                                </div>
                             </div>
-                        )}
-                    </button>
-                </form>
+                        </div>
+
+                        {/* Additional Details Section */}
+                        <div className="bg-white rounded-2xl shadow-lg p-1">
+                            <div className="p-4 border-b border-gray-100">
+                                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                    <Target className="w-4 h-4 text-green-500" />
+                                    Additional Details
+                                </h3>
+                                <p className="text-xs text-gray-500 mt-1">Help us personalize your experience</p>
+                            </div>
+
+                            <div className="space-y-4 p-4">
+                                {/* Gender */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <User className="w-4 h-4 text-gray-400" />
+                                        Gender
+                                    </label>
+                                    <select
+                                        name="gender"
+                                        value={formData.gender}
+                                        onChange={handleInputChange}
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white appearance-none"
+                                    >
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+
+                                {/* City */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <MapPin className="w-4 h-4 text-gray-400" />
+                                        City
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        value={formData.city}
+                                        onChange={handleInputChange}
+                                        placeholder="Enter your city"
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                    />
+                                </div>
+
+                                {/* Birth Year */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <Calendar className="w-4 h-4 text-gray-400" />
+                                        Birth Year
+                                    </label>
+                                    <select
+                                        name="birtyear"
+                                        value={formData.birtyear}
+                                        onChange={handleInputChange}
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white appearance-none"
+                                    >
+                                        <option value="">Select Birth Year</option>
+                                        {years.map(year => (
+                                            <option key={year} value={year}>{year}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Primary Goal */}
+                                <div className="space-y-2">
+                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
+                                        <Target className="w-4 h-4 text-gray-400" />
+                                        Primary Goal
+                                    </label>
+                                    <select
+                                        name="primarygoal"
+                                        value={formData.primarygoal}
+                                        onChange={handleInputChange}
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white appearance-none"
+                                    >
+                                        <option value="">Select Your Primary Goal</option>
+                                        {goals.map(goal => (
+                                            <option key={goal} value={goal}>{goal}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Enhanced Submit Button */}
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-lg group"
+                        >
+                            {loading ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-2"></div>
+                                    Updating Profile...
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center gap-3">
+                                    <Save className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+                                    <span className="text-lg">Save Changes</span>
+                                </div>
+                            )}
+                        </button>
+                    </form>
                 )}
             </main>
 
-            <ToastContainer />
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 };

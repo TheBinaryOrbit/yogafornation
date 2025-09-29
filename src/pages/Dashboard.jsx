@@ -114,6 +114,7 @@ export default function Dashboard() {
 
       if (response.data.success) {
         setUserProfile(response.data.user);
+        console.log("Fetched user profile:", response.data.user);
         // Update localStorage with fresh user data
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
@@ -640,6 +641,37 @@ export default function Dashboard() {
               </p>
             </div>
 
+            {/* How to Refer Instructions */}
+            <div className="bg-blue-50 rounded-lg p-4 mb-6">
+              <h3 className="text-base font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                How to Refer Friends
+              </h3>
+              <div className="space-y-3 text-sm text-blue-700">
+                <div className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-semibold">1</span>
+                  <p><strong>Copy your referral link</strong> below and share it with friends</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-semibold">2</span>
+                  <p><strong>Share via WhatsApp</strong> using the share buttons or send directly to your contacts</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-semibold">3</span>
+                  <p><strong>Your friend registers</strong> using your link and joins the yoga community</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-semibold">4</span>
+                  <p><strong>Earn 100 Karma Points</strong> instantly when they complete registration!</p>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-white rounded-lg border-l-4 border-blue-400">
+                <p className="text-xs text-blue-600 font-medium">💡 Pro Tip: Share your personal yoga journey story along with the link to motivate friends to join!</p>
+              </div>
+            </div>
+
             {/* Referral Link */}
             <div className="flex items-center gap-2 mb-4 p-3 bg-gray-50 rounded-lg border">
               <input
@@ -764,7 +796,10 @@ export default function Dashboard() {
 
         {/* Weekly Attendance Tracking */}
         <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="font-semibold text-gray-800 mb-4">Attendance</h3>
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">Weekly Attendance</h3>
+            <p className="text-sm text-gray-600 italic">(Your Journey, Our Inspiration)</p>
+          </div>
 
           {attendanceLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -782,57 +817,35 @@ export default function Dashboard() {
             </div>
           ) : weeklyAttendance ? (
             <>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <p className="text-sm text-gray-600">Total Classes:</p>
-                  <p className="font-semibold text-gray-800">{userProfile?.total_classes_attended}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Current Streak:</p>
-                  <p className="font-semibold text-gray-800">{userProfile?.current_streak}</p>
-                </div>
-              </div>
-              {/* Stats Overview */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <p className="text-sm text-gray-600">Days Attended:</p>
-                  <p className="font-semibold text-gray-800">{weeklyAttendance.stats.days_attended}/{weeklyAttendance.stats.total_days}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Attendance Rate:</p>
-                  <p className="font-semibold text-gray-800">{weeklyAttendance.stats.weekly_attendance_rate.toFixed(1)}%</p>
-                </div>
-              </div>
-
-              {/* Week Period */}
-              <div className="bg-blue-50 p-3 rounded-lg mb-4">
-                <p className="text-sm text-blue-800 font-medium">
-                  Week: {new Date(weeklyAttendance.period.start_date).toLocaleDateString()} - {new Date(weeklyAttendance.period.end_date).toLocaleDateString()}
-                </p>
-                {weeklyAttendance.period.is_current_week && (
-                  <p className="text-xs text-blue-700">Current Week</p>
-                )}
-              </div>
-
-              {/* Weekly Calendar */}
-              <div className="mb-4">
+              {/* Weekly Calendar - Sunday to Saturday */}
+              <div className="mb-6">
                 <div className="grid grid-cols-7 gap-1 text-center text-xs mb-2">
-                  {
-                    weeklyAttendance.weekly_calendar.map((d) => (
-                      <div className="font-medium text-gray-600 p-2">{d.day_name.slice(0, 3)}</div>
-                    ))
-                  }
+                  {/* Day headers starting from Sunday */}
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                    <div key={day} className="font-medium text-gray-600 p-2">{day}</div>
+                  ))}
                 </div>
 
                 <div className="grid grid-cols-7 gap-1 text-center text-xs">
-                  {weeklyAttendance.weekly_calendar.map((day) => {
+                  {/* Reorder calendar to start from Sunday */}
+                  {(() => {
+                    const reorderedCalendar = [...weeklyAttendance.weekly_calendar];
+                    // Find Sunday and reorder if needed
+                    const sundayIndex = reorderedCalendar.findIndex(day => day.day_name === 'Sunday');
+                    if (sundayIndex !== 0) {
+                      // Reorder to start from Sunday
+                      const sundayToSat = reorderedCalendar.slice(sundayIndex).concat(reorderedCalendar.slice(0, sundayIndex));
+                      return sundayToSat;
+                    }
+                    return reorderedCalendar;
+                  })().map((day) => {
                     const dayNum = new Date(day.date).getDate();
                     const isToday = day.date === new Date().toISOString().split('T')[0];
 
                     return (
                       <div
                         key={day.date}
-                        className={`p-2 rounded relative ${day.status === "attended"
+                        className={`p-3 rounded-lg relative ${day.status === "attended"
                           ? "bg-green-500 text-white"
                           : day.status === "not_attended"
                             ? "bg-gray-100 text-gray-600"
@@ -842,7 +855,7 @@ export default function Dashboard() {
                       >
                         <div className="font-medium">{dayNum}</div>
                         {day.attendance_count > 0 && (
-                          <div className="text-xs">{day.attendance_count}</div>
+                          <div className="text-xs mt-1">{day.attendance_count}</div>
                         )}
                       </div>
                     );
@@ -851,7 +864,7 @@ export default function Dashboard() {
               </div>
 
               {/* Legend */}
-              <div className="flex justify-between items-center text-xs">
+              <div className="flex justify-between items-center text-xs mb-6">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded"></div>
                   <span className="text-gray-600">ATTENDED</span>
@@ -866,31 +879,70 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Classes Detail (if any attended day is selected) */}
-              {weeklyAttendance.weekly_calendar.some(day => day.attendance_count > 0) && (
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs font-medium text-gray-700 mb-2">Recent Classes:</p>
-                  {weeklyAttendance.weekly_calendar
-                    .filter(day => day.attendance_count > 0)
-                    .slice(0, 3)
-                    .map(day => (
-                      <div key={day.date} className="mb-2 last:mb-0">
-                        <p className="text-xs text-gray-600">{day.day_name}, {new Date(day.date).toLocaleDateString()}</p>
-                        {day.classes.slice(0, 2).map(cls => (
-                          <div key={cls.id} className="text-xs text-gray-500 ml-2">
-                            • {cls.class_name} ({cls.start_time.slice(0, 5)}) - {cls.status_display}
-                          </div>
-                        ))}
-                      </div>
-                    ))}
+              {/* Stats Below the Chart */}
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Total Classes Attended:</span>
+                  <span className="font-semibold text-gray-800">{userProfile?.total_classes_attended || 0}</span>
                 </div>
-              )}
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Current Streak:</span>
+                  <span className="font-semibold text-gray-800">{userProfile?.current_streak || 0}</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Attendance Rate:</span>
+                  <span className="font-semibold text-gray-800">{weeklyAttendance.stats.weekly_attendance_rate?.toFixed(1) || 0.0}%</span>
+                </div>
+              </div>
             </>
           ) : (
             <div className="text-center py-6">
-              <p className="text-gray-500">No attendance data available</p>
+              <p className="text-gray-500 mb-4">No attendance data available</p>
+              
+              {/* Default Stats for No Data */}
+              <div className="space-y-3 max-w-xs mx-auto">
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Total Classes Attended:</span>
+                  <span className="font-semibold text-gray-800">0</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Current Streak:</span>
+                  <span className="font-semibold text-gray-800">0</span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm text-gray-600">Attendance Rate:</span>
+                  <span className="font-semibold text-gray-800">0.0%</span>
+                </div>
+              </div>
             </div>
           )}
+        </div>
+
+        {/* Daily Ritual Card */}
+        {/* Daily Ritual Card */}
+        <div className="mx-4 mb-6 bg-purple-100 rounded-xl p-4 flex items-center justify-between shadow-sm border border-purple-200">
+          {/* Left Side */}
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-200 text-purple-600 p-2 rounded-lg">
+              <Gift className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-purple-700">
+                Invite 1st friend
+              </h3>
+              <p className="text-xs text-purple-500">
+                Win +100 karma points
+              </p>
+            </div>
+          </div>
+
+          {/* Right Side Button */}
+          <button
+            onClick={() => setActiveTab("referral")}
+            className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
+          >
+            Send Invite
+          </button>
         </div>
 
 
@@ -1074,6 +1126,11 @@ export default function Dashboard() {
               {/* <p className="text-blue-100 text-sm mb-4">
                 Connect with fellow yogis, get daily tips, and stay updated with the latest yoga practices in our Telegram community.
               </p> */}
+
+              <p className="text-blue-100 text-sm mb-4">
+                Join with LOVNISH GUPTA<br />
+                Yoga Alliance certified | 18+Years Exp.
+              </p>
               <div className="flex items-center gap-2 text-blue-100 text-xs mb-4">
                 <Users className="w-4 h-4" />
                 <span>1000+ Active Members</span>
@@ -1095,9 +1152,32 @@ export default function Dashboard() {
             className="w-full bg-white text-blue-600 mt-4 py-3 px-4 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
-                <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
+              <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
             </svg>
             Join Whatsapp Community
+          </button>
+        </div>
+
+        {/* Donation Card */}
+        <div className="mx-5 mb-6 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold text-white mb-2">Support Our Mission</h3>
+              <p className="text-pink-100 text-sm mb-4">
+                Help us spread the gift of yoga to more people. Your donations make a difference in building a healthier community.
+              </p>
+              <div className="flex items-center gap-2 text-pink-100 text-xs mb-4">
+                <Heart className="w-4 h-4" />
+                <span>Making Yoga Accessible for Everyone</span>
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/donations')}
+            className="w-full bg-white text-pink-600 py-3 px-4 rounded-lg font-medium text-sm hover:bg-pink-50 transition-colors flex items-center justify-center gap-2"
+          >
+            <Heart className="w-4 h-4" />
+            Make a Donation
           </button>
         </div>
 
@@ -1138,7 +1218,8 @@ export default function Dashboard() {
             </div>
             <div>
               <p className="font-semibold text-gray-800">{userProfile?.name || "Loading..."}</p>
-              <p className="text-sm text-gray-500">{userProfile?.email || "No email"}</p>
+              {/* <p className="text-sm text-gray-500">{userProfile?.email || "No email"}</p> */}
+              <p className="text-sm text-gray-500">{`YNF-${userProfile?.id}` || "No user ID"}</p>
             </div>
           </div>
           <button
@@ -1174,18 +1255,8 @@ export default function Dashboard() {
                 <span className="text-gray-700">Edit Profile</span>
               </button>
 
-              <button
-                onClick={() => {
-                  setActiveTab("home");
-                  setSidebarOpen(false);
-                }}
-                className="w-full flex items-center gap-3 p-3 text-left hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Home className="w-5 h-5 text-gray-600" />
-                <span className="text-gray-700">Dashboard</span>
-              </button>
 
-              <button
+              {/* <button
                 onClick={() => {
                   setActiveTab("resources");
                   setSidebarOpen(false);
@@ -1194,7 +1265,7 @@ export default function Dashboard() {
               >
                 <BookOpen className="w-5 h-5 text-gray-600" />
                 <span className="text-gray-700">Resources</span>
-              </button>
+              </button> */}
 
               <button
                 onClick={() => {
@@ -1207,7 +1278,7 @@ export default function Dashboard() {
                 <span className="text-gray-700">Donations</span>
               </button>
 
-              <button
+              {/* <button
                 onClick={() => {
                   setActiveTab("referral");
                   setSidebarOpen(false);
@@ -1216,7 +1287,7 @@ export default function Dashboard() {
               >
                 <Users className="w-5 h-5 text-gray-600" />
                 <span className="text-gray-700">My Referral</span>
-              </button>
+              </button> */}
 
               <button
                 onClick={handleLogout}
@@ -1244,13 +1315,16 @@ export default function Dashboard() {
             </button>
             <div>
               <p className="text-xs text-gray-500">Namaste</p>
-              <p className="font-semibold text-gray-800">{userProfile?.name || "Loading..."}</p>
+              <p className="font-semibold text-gray-800">{userProfile?.name || "Loading..."} Ji</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-lg font-bold">{userProfile?.karma_points || 0}</span>
-            <span className="text-sm text-gray-600">Karma Points</span>
+            <span className="text-sm text-gray-600 ">Karma Points</span>
+            <LogOut className="w-6 h-6 p-1 ml-2.5 bg-red-200 text-red-600 rounded-sm cursor-pointer" onClick={handleLogout} />
           </div>
+
+
         </div>
       </header>
 

@@ -7,6 +7,7 @@ import axios from "axios"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import useGetuser from "../hooks/user"
+import loginImage from "../assets/login.png"
 
 const Login = () => {
     const user = useGetuser();
@@ -70,10 +71,10 @@ const Login = () => {
     }
 
     return (
-        <div className="min-h-screen ">
-            <div className="min-h-screen  max-w-md mx-auto px-4 py-8 bg-gradient-to-br from-green-100 via-white to-blue-50">
+        <div className="min-h-screen">
+            <div className="min-h-screen  max-w-md mx-auto px-4 bg-gradient-to-br from-green-100 via-white to-blue-50">
                 {/* Logo */}
-                <div className="mb-8 text-center">
+                <div className="text-center">
                     <img
                         src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/png-logo-j9moV4DkAQHKCtbAK5mKGOyrYzxFGO.png"
                         alt="Yoga For Nation Logo"
@@ -82,10 +83,8 @@ const Login = () => {
                 </div>
 
                 {/* Main Heading */}
-                <div className="mb-8 text-center">
-                    {/* <div className="inline-block bg-gradient-to-r from-green-400 to-blue-400 text-white px-4 py-1 rounded-full text-sm font-semibold mb-3">
-                        14-DAY ONLINE PROGRAM
-                    </div> */}
+                <div className="text-center">
+                  
                     <h1 className="text-3xl font-bold text-green-700 mb-2">FREE YOGA</h1>
                     <div className="flex items-center justify-center">
                         <div className="w-6 h-0.5 bg-green-500 mr-2"></div>
@@ -94,10 +93,26 @@ const Login = () => {
                     </div>
                 </div>
 
+                {/* Instructor Section */}
+                <div className="mb-8 text-center relative">
+                    <div className="relative inline-block">
+                        <img
+                            src={loginImage}
+                            alt="Lovnish Gupta"
+                            className="mx-auto object-cover"
+                        />
+                        {/* Instructor Details Overlay */}
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg px-2 py-2 shadow-lg border border-gray-200">
+                            <h2 className="text-sm font-bold text-gray-800 mb-1">Lovnish Gupta</h2>
+                            <p className="text-xs text-gray-600 mb-1">CEO & Founder, Yoga for Nation</p>
+                            <p className="text-xs text-gray-600">Yoga Alliance Certified | 18+ Years Exp.</p>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Registration Form */}
-                <div className="bg-white rounded-2xl shadow-xl p-6 border border-green-100">
-                    <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">Welcome Back</h3>
+                <div className="rounded-2xl px-6">
+                    {/* <h3 className="text-xl font-bold text-gray-800 mb-6 text-center">Welcome Back</h3> */}
                     <form onSubmit={handleSubmit} className="space-y-5">
 
                         {/* Phone Input */}
@@ -149,14 +164,6 @@ const Login = () => {
                                 }
                             </div>
                         </div>
-
-                        {/* Forgot Password Link */}
-                        {/* <div className="text-right">
-                            <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-700">
-                                Forgot Password?
-                            </Link>
-                        </div> */}
-
                         {/* Submit Button */}
                         <button
                             type="submit"
@@ -182,9 +189,9 @@ const Login = () => {
                 </div>
 
                 {/* Footer Note */}
-                <p className="text-xs text-gray-500 mt-6 text-center">
+                {/* <p className="text-xs text-gray-500 mt-6 text-center">
                     By continuing, you agree to our Terms of Service and Privacy Policy
-                </p>
+                </p> */}
             </div>
             <ToastContainer />
         </div>
