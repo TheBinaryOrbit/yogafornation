@@ -20,8 +20,8 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
-    useEffect(()=>{
-        if(user){
+    useEffect(() => {
+        if (user) {
             navigate("/dashboard");
         }
     }, [user, navigate])
@@ -41,7 +41,7 @@ const Login = () => {
                 phonenumber: formData.phonenumber,
                 password: formData.password
             });
-            
+
             if (response.status === 200 && response.data.success) {
                 // Store token and user info as needed
                 localStorage.setItem("token", response.data.token);
@@ -84,7 +84,7 @@ const Login = () => {
 
                 {/* Main Heading */}
                 <div className="text-center">
-                  
+
                     <h1 className="text-3xl font-bold text-green-700 mb-2">FREE YOGA</h1>
                     <div className="flex items-center justify-center">
                         <div className="w-6 h-0.5 bg-green-500 mr-2"></div>
@@ -101,14 +101,26 @@ const Login = () => {
                             alt="Lovnish Gupta"
                             className="mx-auto object-cover"
                         />
-                        {/* Instructor Details Overlay */}
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-90 backdrop-blur-sm rounded-lg px-2 py-2 shadow-lg border border-gray-200">
-                            <h2 className="text-sm font-bold text-gray-800 mb-1">Lovnish Gupta</h2>
-                            <p className="text-xs text-gray-600 mb-1">CEO & Founder, Yoga for Nation</p>
-                            <p className="text-xs text-gray-600">Yoga Alliance Certified | 18+ Years Exp.</p>
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-full px-4  bg-white
+                 [mask-image:radial-gradient(circle,rgba(255,255,255,1)_70%,rgba(255,255,255,0)_100%)]
+                 [-webkit-mask-image:radial-gradient(circle,rgba(255,255,255,1)_70%,rgba(255,255,255,0)_100%)]
+                 [mask-repeat:no-repeat] [mask-position:center] [mask-size:cover]">
+                            <div className="text-center leading-none">
+                                <h2 className="text-green-700 font-bold uppercase tracking-wide text-2xl">
+                                    Lovnish Gupta
+                                </h2>
+                                <p className="mt-1 text-slate-900 font-extrabold">
+                                    Govt Certified Yoga Teacher
+                                </p>
+                                <p className="text-slate-600 text-sm">
+                                    IIT Graduate | 12+ Years Exp.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+
 
                 {/* Registration Form */}
                 <div className="rounded-2xl px-6">
@@ -118,7 +130,7 @@ const Login = () => {
                         {/* Phone Input */}
                         <div className="relative">
 
-                            <div className="flex">
+                            <div className="flex mt-10">
                                 <span className="px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100">
                                     <span>
                                         <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg" alt="" className="inline-block h-4 mr-1 -translate-y-0.5 rounded-sm" />
