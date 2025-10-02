@@ -16,6 +16,8 @@ import LiveClassesPage from './pages/LiveClassesPage'
 import AddFAQs from './pages/AddFAQs'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import ProfileEdit from './pages/ProfileEdit'
 import { DashboardProvider } from './contexts/DashboardContext'
 import { AdminAuthProvider } from './contexts/AdminAuthContext'
@@ -33,6 +35,8 @@ function App() {
         <Route path="/landing" element={<LandingPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path='/dashboard' element={
           <DashboardProvider>
             <Dashboard />

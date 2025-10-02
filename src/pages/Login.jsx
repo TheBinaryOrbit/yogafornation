@@ -72,7 +72,7 @@ const Login = () => {
 
     return (
         <div className="min-h-screen">
-            <div className="min-h-screen  max-w-md mx-auto px-4 bg-gradient-to-br from-green-100 via-white to-blue-50">
+            <div className="min-h-screen  max-w-md mx-auto bg-gradient-to-br from-green-100 via-white to-blue-50">
                 {/* Logo */}
                 <div className="text-center">
                     <img
@@ -94,17 +94,20 @@ const Login = () => {
                 </div>
 
                 {/* Instructor Section */}
-                <div className="mb-8 text-center relative">
+                <div className="mb-10 text-center relative bg-white
+                 [mask-image:radial-gradient(circle,rgba(255,255,255,1)_70%,rgba(255,255,255,0)_100%)]
+                 [-webkit-mask-image:radial-gradient(circle,rgba(255,255,255,1)_70%,rgba(255,255,255,0)_100%)]
+                 [mask-repeat:no-repeat] [mask-position:center] [mask-size:cover]">
                     <div className="relative inline-block">
                         <img
                             src={loginImage}
                             alt="Lovnish Gupta"
-                            className="mx-auto object-cover"
+                            className="object-cover"
                         />
-                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-full px-4  bg-white
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-full px-4  bg-white
                  [mask-image:radial-gradient(circle,rgba(255,255,255,1)_70%,rgba(255,255,255,0)_100%)]
                  [-webkit-mask-image:radial-gradient(circle,rgba(255,255,255,1)_70%,rgba(255,255,255,0)_100%)]
-                 [mask-repeat:no-repeat] [mask-position:center] [mask-size:cover]">
+                 [mask-repeat:no-repeat] [mask-position:center] [mask-size:cover] pb-4">
                             <div className="text-center leading-none">
                                 <h2 className="text-green-700 font-bold uppercase tracking-wide text-2xl">
                                     Lovnish Gupta
@@ -176,6 +179,14 @@ const Login = () => {
                                 }
                             </div>
                         </div>
+
+                        {/* Forgot Password Link */}
+                        <div className="text-right">
+                            <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-700">
+                                Forgot Password?
+                            </Link>
+                        </div>
+
                         {/* Submit Button */}
                         <button
                             type="submit"
