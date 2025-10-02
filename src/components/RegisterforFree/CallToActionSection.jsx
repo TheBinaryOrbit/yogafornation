@@ -14,18 +14,18 @@ const CallToActionSection = () => {
         */}
         <div className="mx-auto max-w-6xl rounded-3xl bg-[#092B45] p-10 sm:p-16 lg:p-20 text-center shadow-xl">
           
-          {/* "Start Your Journey" sub-heading */}
+          {/* "Want to Feel Calmer" sub-heading */}
           <h2 className="text-base font-semibold leading-7 text-gray-300">
-            Start Your Journey
+            Join the Movement!
           </h2>
 
           {/* Main heading */}
           <p className="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Ready for a Change? Begin Your Wellness Journey!
+            Want to Feel Calmer, Stronger, and More Connected?
           </p>
           
           {/* Register Button */}
-          <Link to="/login">
+          <Link to="/register">
           <div className="mt-12"> {/* Increased margin-top for more space */}
             <a
               href="/register" // <-- Your registration page link

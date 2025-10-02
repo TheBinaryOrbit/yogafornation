@@ -3,44 +3,44 @@ import React from 'react';
 // --- Data and Icon components are unchanged ---
 const benefits = [
   {
-    name: 'Accountability Support',
-    description: 'Stay on track with regular check-ins and guidance to ensure you meet your wellness goals.',
-    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286zm0 13.036h.008v.008h-.008v-.008z" /></svg>),
+    name: 'Guided Practice',
+    description: 'Stay on the right path with clear, expert-led sessions. Our instructors provide personalized guidance, ensuring you practice safely and effectively from day one.',
+    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.5c-.69 0-1.25-.56-1.25-1.25V9.5c0-.69.56-1.25 1.25-1.25H6.75z" /></svg>),
     iconBgColor: 'bg-blue-100',
     iconTextColor: 'text-blue-600',
   },
   {
-    name: 'Flexible Timings',
-    description: 'Choose from various time slots to fit yoga seamlessly into your schedule.',
+    name: 'Flexible Schedules',
+    description: 'Your well-being should fit into your life, not the other way around. Choose from a range of live classes throughout the day, so you can practice when it suits you best.',
     icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>),
     iconBgColor: 'bg-yellow-100',
     iconTextColor: 'text-yellow-700',
   },
   {
-    name: 'Easy Accessibility',
-    description: 'Join sessions anytime, anywhere, with simple access across devices.',
+    name: 'Yoga, Anywhere',
+    description: 'Your living room is now your studio. Our classes are easily accessible on any device, so you can start or end your day with a calm practice, no matter where you are.',
     icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" /></svg>),
     iconBgColor: 'bg-green-100',
     iconTextColor: 'text-green-600',
   },
   {
-    name: 'Community Health Programs',
-    description: 'Engage with others in group programs that boost collective well-being.',
-    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.5-2.962a3.75 3.75 0 015.25 0m-5.25 0a3.75 3.75 0 00-5.25 0M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>),
+    name: 'Collective Well-being',
+    description: 'Be a part of something bigger. Join our group programs and community challenges designed to boost collective health and inspire a shared commitment to wellness.',
+    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>),
     iconBgColor: 'bg-pink-100',
     iconTextColor: 'text-pink-600',
   },
   {
-    name: 'Habit Tracking Reminders',
-    description: 'Receive gentle nudges to build and maintain your healthy habits effortlessly.',
-    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0h18M9.75 14.25l1.5 1.5 3-3.75" /></svg>),
+    name: 'Build Your Habit',
+    description: 'Make yoga a natural part of your routine. We provide encouraging reminders and tools to help you stay consistent and build a sustainable habit for life.',
+    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L13.5 21.75 16.5 12h-8.25z" /></svg>),
     iconBgColor: 'bg-purple-100',
     iconTextColor: 'text-purple-600',
   },
   {
-    name: 'Physiotherapy Support',
-    description: 'Personalized guidance from experts to aid in physical recovery and care.',
-    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15M12 4.5a3.75 3.75 0 013.75 3.75H8.25A3.75 3.75 0 0112 4.5zM12 21a3.75 3.75 0 003.75-3.75H8.25A3.75 3.75 0 0012 21z" /></svg>),
+    name: 'Progress at Your Pace',
+    description: 'Whether you\'re new to yoga or looking to deepen your poses, our classes are structured to help you grow steadily. There\'s a path for every person, every level.',
+    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>),
     iconBgColor: 'bg-red-100',
     iconTextColor: 'text-red-600',
   },
@@ -52,11 +52,14 @@ const ExclusiveBenefits = () => {
     <div className="pb-8 bg-white pt- sm:pt-16 sm:pb-24">
       <div className="px-6 mx-auto max-w-7xl lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-base font-semibold leading-7 text-orange-500 mt-10">
-            Membership Features
+          <h2 className="text-base font-semibold leading-7 text-teal-600 mt-10">
+            Our Features
           </h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Unlock Your Exclusive Benefits
+            Unlock Your Journey to Wellness
+          </p>
+          <p className="mt-6 text-lg leading-8 text-gray-600">
+            At Yoga for Nation, we are dedicated to making yoga accessible and enjoyable for everyone. Discover what makes our free yoga movement special:
           </p>
         </div>
         

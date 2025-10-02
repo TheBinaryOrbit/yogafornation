@@ -11,10 +11,11 @@ import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const [heroData, setHeroData] = useState({
-    title: "India's First Habit Building Program",
-    subtitle: "Start your fitness journey with us",
-    button_text: "Try Free Sessions",
-    button_link: "/login",
+    title: "A Movement for a Healthier Nation",
+    hindi_title: "स्वस्थ राष्ट्र का संकल्प",
+    subtitle: "Everyone deserves good health. Join our community and access high-quality yoga classes—completely free, for everyone.",
+    button_text: "Join for Free",
+    button_link: "/register",
     trusted_text: "Trusted by",
     member_count: "1.24 Crore +"
   });
@@ -72,6 +73,11 @@ const HeroSection = () => {
             {heroData.title}
           </h1>
 
+          {/* Hindi title */}
+          <h2 className="mt-4 text-2xl font-semibold text-teal-600 sm:text-3xl">
+            {heroData.hindi_title}
+          </h2>
+
           {/* Subheading */}
           <p className="mt-6 text-lg leading-8 text-gray-600">
             {heroData.subtitle}
@@ -79,7 +85,7 @@ const HeroSection = () => {
 
           {/* Button */}
           <div className="mt-10">
-            <Link to="/login">
+            <Link to="/register">
               <button
                 type="button"
                 className="inline-flex items-center justify-center px-8 py-4 text-xl font-semibold text-white transition-transform duration-200 bg-teal-500 rounded-full shadow-lg hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"

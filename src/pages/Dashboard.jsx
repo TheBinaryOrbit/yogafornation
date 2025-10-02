@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart, AlignEndHorizontal, Star, HomeIcon } from "lucide-react"
+import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart, AlignEndHorizontal, Star, HomeIcon  , ArrowLeft } from "lucide-react"
 
 import Resources from "./Resources"
 import useGetuser from "../hooks/user"
@@ -10,7 +10,7 @@ import axios from "axios"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { useDashboard } from '../contexts/DashboardContext'
-
+import img from '../assets/qrcodecopy.png'
 export default function Dashboard() {
   // Rating modal state
   const [showRatingModal, setShowRatingModal] = useState(false);
@@ -966,7 +966,7 @@ export default function Dashboard() {
 
             {/* Right Side Button */}
             <button
-              onClick={() => setActiveTab("referral")}
+              onClick={() => shareOnWhatsApp()}
               className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
             >
               Send Invite
@@ -1161,27 +1161,32 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Donation Card */}
+        {/* Donation Card with QR Code */}
         <div className="mx-5 mb-6 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold text-white mb-2">Support Our Mission</h3>
-              <p className="text-pink-100 text-sm mb-4">
-                Help us spread the gift of yoga to more people. Your donations make a difference in building a healthier community.
-              </p>
-              <div className="flex items-center gap-2 text-pink-100 text-xs mb-4">
-                <Heart className="w-4 h-4" />
-                <span>Making Yoga Accessible for Everyone</span>
-              </div>
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-white">Contribute to Our Mission</h3>
+            <h3 className="text-md font-semibold text-white ">🙏Support via UPI</h3>
+            <h3 className="text-md font-semibold text-white mb-4">UPI : yogafornation@barodampay</h3>
+            
+            {/* QR Code Section */}
+            <div className="bg-white rounded-lg p-4 mb-4 inline-block">
+              <img
+                src={img}
+                alt="Donation QR Code"
+                className="w-32 h-32 mx-auto"
+              />
+              <p className="text-xs text-gray-600 mt-2">Scan to Donate</p>
             </div>
+            
+            {/* Donate Button */}
+            <button
+              onClick={() => navigate('/donations')}
+              className="w-full bg-white text-pink-600 py-3 px-4 rounded-lg font-medium text-sm hover:bg-pink-50 transition-colors flex items-center justify-center gap-2"
+            >
+              <Heart className="w-4 h-4" />
+              Donate to Support
+            </button>
           </div>
-          <button
-            onClick={() => navigate('/donations')}
-            className="w-full bg-white text-pink-600 py-3 px-4 rounded-lg font-medium text-sm hover:bg-pink-50 transition-colors flex items-center justify-center gap-2"
-          >
-            <Heart className="w-4 h-4" />
-            Make a Donation
-          </button>
         </div>
 
 
@@ -1311,12 +1316,14 @@ export default function Dashboard() {
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setSidebarOpen(true)}
+              onClick={() => {
+                window.history.back();
+              }}
               className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <Menu className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
             </button>
-            <div>
+            <div onClick={() => navigate("/profile-edit")} className="cursor-pointer">
               <p className="text-xs text-gray-500">Namaste</p>
               <p className="font-semibold text-gray-800">{userProfile?.name || "Loading..."} Ji</p>
             </div>

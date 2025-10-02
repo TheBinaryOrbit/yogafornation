@@ -1,36 +1,23 @@
 import React from 'react';
 
 // CORRECTED IMPORTS: Update these paths to match your new folder structure.
-import saurabhImage from "../../assets/saurabh.png";
-import trishalaImage from "../../assets/trishala.png";
+import loginImage from "../../assets/login.png";
 
 // The rest of the component code remains exactly the same.
 const trainers = [
   {
-    name: 'Saurabh Bothra',
-    program: 'Yoga Everyday',
-    stats: '12+ yrs of Yoga teaching to 12.4 million+ people',
-    description: 'Practical, impactful daily exercises and asanas create a thoughtful program for a healthy body and mind.',
-    imageSrc: saurabhImage, // This now correctly uses the imported image
+    name: 'Lovnish Gupta',
+    program: 'Yoga for a Healthier Nation',
+    title: 'CEO & Founder, Yoga for Nation',
+    stats: '18+ years of experience teaching yoga to thousands of people',
+    description: 'The Yoga for Nation movement is guided by the passion and expertise of our founder, Lovnish Gupta. With 18+ years of experience teaching yoga to thousands of people, he brings a wealth of knowledge and a deep commitment to wellness. His simple, practical approach makes yoga accessible and enjoyable for everyone.',
+    imageSrc: loginImage, // This now correctly uses the imported image
     social: {
       facebook: '#',
       instagram: '#',
       youtube: '#',
     },
     imagePosition: 'left',
-  },
-  {
-    name: 'Trishala Bothra',
-    program: 'Dance & Strength',
-    stats: null,
-    description: 'Experience Zumba: a fun, high-energy dance fitness class designed for joyful cardio. Stay excited to exercise and come back for more.',
-    imageSrc: trishalaImage, // This also uses the imported image
-    social: {
-      facebook: '#',
-      instagram: '#',
-      youtube: '#',
-    },
-    imagePosition: 'right',
   },
 ];
 
@@ -65,9 +52,12 @@ const MeetYourTrainer = () => {
     <section className="pt-12 pb-24 bg-white sm:pt-16 sm:pb-32">
       <div className="px-6 mx-auto max-w-7xl lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Meet Your Trainer
+          <h2 className="text-base font-semibold leading-7 text-teal-600">
+            The Teacher Behind Our Movement
           </h2>
+          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            A New Approach to Yoga
+          </p>
         </div>
         <div className="mt-16 space-y-20 lg:mt-24 lg:space-y-24">
           {trainers.map((trainer) => (
@@ -83,9 +73,12 @@ const MeetYourTrainer = () => {
                 <h3 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
                   {trainer.program} with {trainer.name}
                 </h3>
+                <h4 className="mt-2 text-lg font-semibold text-teal-600">
+                  {trainer.title}
+                </h4>
                 {trainer.stats && (
-                  <p className="mt-4 text-gray-600">
-                    <strong className="font-semibold text-indigo-600">{trainer.stats.split(' ')[0]}</strong> of Yoga teaching to <strong className="font-semibold text-indigo-600">{trainer.stats.split(' ')[6]}</strong> people
+                  <p className="mt-4 text-gray-600 font-medium">
+                    {trainer.stats}
                   </p>
                 )}
                 <p className="mt-6 text-lg leading-8 text-gray-600">

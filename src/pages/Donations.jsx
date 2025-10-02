@@ -30,7 +30,7 @@ export default function Donations() {
         { amount: 100, type: "Sewa", description: "Support daily operations" },
         { amount: 501, type: "Sahayog", description: "Help community programs" },
         { amount: 1100, type: "Samarpan", description: "Full dedication support" },
-        { amount: 2100, type: "Seva Plus", description: "Extended community support" },
+        { amount: 2100, type: "Sankalp", description: "Extended community support" },
     ]
 
     useEffect(() => {
@@ -470,10 +470,9 @@ export default function Donations() {
                     <>
                         {/* Donation Impact Message */}
                         <div className="bg-gradient-to-r from-green-500 to-blue-600 rounded-lg p-4 text-white mb-6">
-                            <h2 className="font-semibold mb-2">Support Our Mission</h2>
+                            <h2 className="font-semibold mb-2">Contribute to Our Mission</h2>
                             <p className="text-sm text-white/90">
-                                Your donations help us provide free yoga classes and build a stronger community.
-                                Every contribution earns you Karma Points!
+                                Our mission at Yoga for Nation is to make the gift of health and wellness accessible to every individual in India, completely free of charge. Your generous contribution helps us run our daily free classes, maintain our platform, and continue to reach more people across the nation
                             </p>
                         </div>
 
@@ -503,7 +502,7 @@ export default function Donations() {
 
                         {/* Custom Amount */}
                         <div className="mb-6">
-                            <h3 className="font-semibold text-gray-800 mb-3">Or Enter Custom Amount</h3>
+                            <h3 className="font-semibold text-gray-800 mb-3">अपनी श्रद्धा से योगदान दें।</h3>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
                                 <input
@@ -513,7 +512,7 @@ export default function Donations() {
                                         setCustomAmount(e.target.value)
                                         setAmount("")
                                     }}
-                                    placeholder="Enter amount"
+                                    placeholder="Enter any amount"
                                     className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 />
                             </div>

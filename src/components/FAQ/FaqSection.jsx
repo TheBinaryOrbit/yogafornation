@@ -6,20 +6,52 @@ const FaqSection = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Default FAQ data
+  const defaultFAQs = [
+    {
+      id: 1,
+      question: "Are the online yoga classes really free?",
+      answer: "Yes, our online yoga classes are and always will be completely free. Our mission is to make wellness accessible to everyone and to build a healthier nation together. There are no hidden fees or memberships required to join our daily sessions."
+    },
+    {
+      id: 2,
+      question: "How do I join the free yoga classes?",
+      answer: "Joining our movement is simple. Just click the \"Join for Free\" button on our website, and you will be guided to our WhatsApp group. All class links and reminders are shared directly on our WhatsApp community, making it easy to join from your phone or computer."
+    },
+    {
+      id: 3,
+      question: "Are the classes suitable for a beginner?",
+      answer: "Absolutely! Our classes are designed for all levels, from complete beginners to advanced practitioners. Our instructor provides clear guidance and offers modifications for each pose, ensuring a safe and effective practice for everyone."
+    },
+    {
+      id: 4,
+      question: "What are the class timings?",
+      answer: "We offer classes at multiple times throughout the day to fit your busy schedule. We have sessions in the morning and evening, so you can always find a convenient time to practice from the comfort of your home."
+    },
+    {
+      id: 5,
+      question: "What do I need to get started?",
+      answer: "All you need is a stable internet connection, a quiet space, and a yoga mat (or a comfortable surface). Just show up, and our instructor will guide you through the rest."
+    }
+  ];
+
   useEffect(() => {
     const fetchFAQs = async () => {
       try {
         setLoading(true);
         const response = await axios.get('https://lightsteelblue-woodcock-286554.hostingersite.com/api/faqs');
         
-        if (response.data.success) {
+        if (response.data.success && response.data.faqs.length > 0) {
           setFaqData(response.data.faqs);
         } else {
-          setError('Failed to fetch FAQs');
+          // Use default FAQs if API doesn't return any
+          setFaqData(defaultFAQs);
         }
       } catch (err) {
         console.error('Error fetching FAQs:', err);
-        setError('Failed to load FAQs. Please try again later.');
+        // Use default FAQs on error
+        setFaqData(defaultFAQs);
+        setError(null); // Don't show error, just use defaults
       } finally {
         setLoading(false);
       }
@@ -74,7 +106,7 @@ const FaqSection = () => {
         {/* CHANGED: Increased width from max-w-4xl to max-w-7xl */}
         <div className="w-full mx-auto"> 
           <h2 className="text-3xl font-bold leading-10 tracking-tight text-center text-gray-900">
-            Frequently asked questions
+            Frequently Asked Questions
           </h2>
           {faqData.length > 0 ? (
             <dl className="mt-10 space-y-6 divide-y divide-gray-900/10">
