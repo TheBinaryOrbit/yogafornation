@@ -17,8 +17,31 @@ const Login = () => {
         phonenumber: "",
         password: "",
     })
+    const [selectedCountry, setSelectedCountry] = useState({
+        code: "IN",
+        dialCode: "+91"
+    })
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+
+    // Country codes data
+    const countryCodes = [
+        { code: "IN", dialCode: "+91", name: "India" },
+        { code: "US", dialCode: "+1", name: "United States" },
+        { code: "GB", dialCode: "+44", name: "United Kingdom" },
+        { code: "CA", dialCode: "+1", name: "Canada" },
+        { code: "AU", dialCode: "+61", name: "Australia" },
+        { code: "DE", dialCode: "+49", name: "Germany" },
+        { code: "FR", dialCode: "+33", name: "France" },
+        { code: "JP", dialCode: "+81", name: "Japan" },
+        { code: "SG", dialCode: "+65", name: "Singapore" },
+        { code: "AE", dialCode: "+971", name: "UAE" },
+        { code: "SA", dialCode: "+966", name: "Saudi Arabia" },
+        { code: "MY", dialCode: "+60", name: "Malaysia" },
+        { code: "TH", dialCode: "+66", name: "Thailand" },
+        { code: "ID", dialCode: "+62", name: "Indonesia" },
+        { code: "PH", dialCode: "+63", name: "Philippines" }
+    ]
 
     useEffect(() => {
         if (user) {
@@ -31,6 +54,11 @@ const Login = () => {
             ...formData,
             [e.target.name]: e.target.value,
         })
+    }
+
+    const handleCountryChange = (e) => {
+        const selected = countryCodes.find(country => country.code === e.target.value)
+        setSelectedCountry(selected)
     }
 
     const handleSubmit = async (e) => {
@@ -132,23 +160,30 @@ const Login = () => {
 
                         {/* Phone Input */}
                         <div className="relative">
-
                             <div className="flex mt-10">
-                                <span className="px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100">
-                                    <span>
-                                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_India.svg" alt="" className="inline-block h-4 mr-1 -translate-y-0.5 rounded-sm" />
-                                        +91
-                                    </span>
-                                </span>
+                                <select
+                                    value={selectedCountry.code}
+                                    onChange={handleCountryChange}
+                                    className="px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100 text-sm font-medium focus:ring-2 focus:ring-green-500 focus:border-green-500 min-w-[80px]"
+                                >
+                                    {countryCodes.map((country) => (
+                                        <option key={country.code} value={country.code}>
+                                            {country.code} {country.dialCode}
+                                        </option>
+                                    ))}
+                                </select>
                                 <input
                                     type="tel"
                                     name="phonenumber"
-                                    placeholder="WhatsApp Number"
+                                    placeholder="Enter Phone Number"
                                     value={formData.phonenumber}
                                     onChange={handleInputChange}
-                                    className="flex-1 block w-full pl-2 pr-3 py-3 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    className="flex-1 block w-full pl-3 pr-3 py-3 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     required
                                 />
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1 ml-1">
+                                Selected: {selectedCountry.name} ({selectedCountry.dialCode})
                             </div>
                         </div>
 
