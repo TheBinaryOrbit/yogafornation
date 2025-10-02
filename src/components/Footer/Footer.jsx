@@ -27,7 +27,7 @@ const navigation = {
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-indigo-900 to-indigo-800 text-white" aria-labelledby="footer-heading">
+    <footer className="bg-gradient-to-b from-teal-500 to-teal-600 text-white" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">
         Footer
       </h2>
