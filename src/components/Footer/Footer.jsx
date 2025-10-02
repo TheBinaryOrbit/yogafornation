@@ -38,7 +38,7 @@ const Footer = () => {
             <img className="h-12 w-auto" src={logoImage} alt="Yoga For Nation" />
             <span className="text-2xl font-bold">Yoga For Nation</span>
           </div>
-          <p className="text-lg text-indigo-200 max-w-2xl">
+          <p className="text-lg text-white max-w-2xl">
             Join our movement towards a healthier nation. Together, we're creating a community 
             where wellness, mindfulness, and authentic connections flourish through the ancient 
             practice of yoga.
@@ -54,7 +54,7 @@ const Footer = () => {
               <ul role="list" className="mt-6 space-y-4">
                 {navigation.community.map((item) => (
                   <li key={item.name}>
-                    <a href={item.href} className="text-sm leading-6 text-indigo-200 hover:text-white transition-colors duration-200">
+                    <a href={item.href} className="text-sm leading-6 text-white hover:text-white transition-colors duration-200">
                       {item.name}
                     </a>
                   </li>
@@ -66,7 +66,7 @@ const Footer = () => {
               <ul role="list" className="mt-6 space-y-4">
                 {navigation.wellness.map((item) => (
                   <li key={item.name}>
-                    <a href={item.href} className="text-sm leading-6 text-indigo-200 hover:text-white transition-colors duration-200">
+                    <a href={item.href} className="text-sm leading-6 text-white hover:text-white transition-colors duration-200">
                       {item.name}
                     </a>
                   </li>
@@ -80,23 +80,23 @@ const Footer = () => {
             <h3 className="text-lg font-semibold leading-6 text-white">Get in Touch</h3>
             <div className="mt-6 space-y-4">
               <div className="flex items-center space-x-3">
-                <svg className="h-5 w-5 text-indigo-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                 </svg>
-                <span className="text-sm text-indigo-200">+91 98765 43210</span>
+                <span className="text-sm text-white">+91 98765 43210</span>
               </div>
               <div className="flex items-center space-x-3">
-                <svg className="h-5 w-5 text-indigo-300" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                 </svg>
-                <span className="text-sm text-indigo-200">hello@yogafornation.com</span>
+                <span className="text-sm text-white">hello@yogafornation.com</span>
               </div>
               <div className="flex items-start space-x-3">
-                <svg className="h-5 w-5 text-indigo-300 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <svg className="h-5 w-5 text-white mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                 </svg>
-                <span className="text-sm text-indigo-200">Mumbai, Maharashtra, India</span>
+                <span className="text-sm text-white">Mumbai, Maharashtra, India</span>
               </div>
             </div>
           </div>
@@ -104,7 +104,7 @@ const Footer = () => {
           {/* Social Media & Newsletter */}
           <div className="mt-10 xl:mt-0">
             <h3 className="text-lg font-semibold leading-6 text-white">Stay Connected</h3>
-            <p className="mt-2 text-sm leading-6 text-indigo-200">
+            <p className="mt-2 text-sm leading-6 text-white">
               Join our community for daily inspiration, wellness tips, and yoga guidance.
             </p>
             
@@ -120,12 +120,12 @@ const Footer = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="w-full min-w-0 appearance-none rounded-l-md border-0 bg-white/5 px-3 py-2 text-base text-white placeholder:text-indigo-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
+                  className="w-full min-w-0 appearance-none rounded-l-md border-0 bg-white/5 px-3 py-2 text-base text-white placeholder:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
                   placeholder="Enter your email"
                 />
                 <button
                   type="submit"
-                  className="flex-none rounded-r-md bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
+                  className="flex-none rounded-r-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
                 >
                   Subscribe
                 </button>
@@ -139,7 +139,7 @@ const Footer = () => {
                   <a
                     key={item.name}
                     href={item.href}
-                    className="text-indigo-300 hover:text-white transition-colors duration-200"
+                    className="text-white hover:text-white transition-colors duration-200"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -153,18 +153,18 @@ const Footer = () => {
         </div>
 
         {/* Bottom Footer */}
-        <div className="mt-12 border-t border-indigo-700 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-sm leading-6 text-indigo-200">
+        <div className="mt-12 border-t border-red-700 pt-8 flex flex-col sm:flex-row justify-between items-center">
+          <p className="text-sm leading-6 text-white">
             &copy; 2024 Yoga For Nation. Building a healthier India, one breath at a time.
           </p>
           <div className="mt-4 sm:mt-0 flex space-x-6">
-            <a href="#" className="text-sm text-indigo-200 hover:text-white transition-colors duration-200">
+            <a href="#" className="text-sm text-white hover:text-white transition-colors duration-200">
               Privacy Policy
             </a>
-            <a href="#" className="text-sm text-indigo-200 hover:text-white transition-colors duration-200">
+            <a href="#" className="text-sm text-white hover:text-white transition-colors duration-200">
               Terms of Service
             </a>
-            <a href="#" className="text-sm text-indigo-200 hover:text-white transition-colors duration-200">
+            <a href="#" className="text-sm text-white hover:text-white transition-colors duration-200">
               Support
             </a>
           </div>
