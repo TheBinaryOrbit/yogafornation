@@ -113,10 +113,10 @@ const Login = () => {
                 {/* Main Heading */}
                 <div className="text-center">
 
-                    <h1 className="text-3xl font-bold text-green-700 mb-2">FREE YOGA</h1>
+                    <h1 className="text-3xl font-bold text-green-700 mb-2">FREE ONLINE YOGA</h1>
                     <div className="flex items-center justify-center">
                         <div className="w-6 h-0.5 bg-green-500 mr-2"></div>
-                        <p className="text-lg text-blue-600 font-medium">Daily Morning Sessions</p>
+                        <p className="text-lg text-blue-600 font-medium">A Movement for a Healthier Nation</p>
                         <div className="w-6 h-0.5 bg-green-500 ml-2"></div>
                     </div>
                 </div>
@@ -231,17 +231,18 @@ const Login = () => {
                             {isLoading ? (
                                 <div className="flex items-center justify-center">
                                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                    Logging in...
+                                    Joining...
                                 </div>
                             ) : (
-                                "Login"
+                                "Click to join for free"
                             )}
                         </button>
+                        <p className="text-center text-green-500 font-semibold">Join the Thousands who have already started their journey with us.</p>
 
                     </form>
 
                     {/* Sign Up Link */}
-                    <div className="mt-6 text-center text-gray-600 border-t border-gray-100 pt-4">
+                    <div className="mt-2 text-center text-gray-600 border-t border-gray-100 pt-2">
                         <p>Don't have an account? <Link to="/register" className="text-green-500 font-semibold hover:text-green-600">Sign up</Link></p>
                     </div>
                 </div>

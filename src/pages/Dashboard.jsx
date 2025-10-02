@@ -792,7 +792,33 @@ export default function Dashboard() {
       <>
         {/* User Stats Card - Modern & Simple */}
 
+        <div className="mx-4 mb-6 rounded-2xl bg-yellow-50 p-[1px] shadow-lg">
 
+          {/* Today's Instruction */}
+          <div className="rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <p className="text-xs font-medium text-gray-600">
+                Today's Focus - {todayInstruction?.day_name || new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+              </p>
+            </div>
+
+            {instructionsLoading ? (
+              <div className="flex items-center justify-center py-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+              </div>
+            ) : todayInstruction ? (
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {todayInstruction.instruction}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-400 italic">
+                No instruction available for today
+              </p>
+            )}
+          </div>
+
+        </div>
 
         {/* Weekly Attendance Tracking */}
         <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
@@ -864,7 +890,7 @@ export default function Dashboard() {
               </div>
 
               {/* Legend */}
-              <div className="flex justify-between items-center text-xs mb-6">
+              {/* <div className="flex justify-between items-center text-xs mb-6">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded"></div>
                   <span className="text-gray-600">ATTENDED</span>
@@ -877,7 +903,7 @@ export default function Dashboard() {
                   <div className="w-3 h-3 bg-blue-400 rounded ring-2 ring-blue-400"></div>
                   <span className="text-gray-600">TODAY</span>
                 </div>
-              </div>
+              </div> */}
 
               {/* Stats Below the Chart */}
               <div className="space-y-3">
@@ -898,7 +924,7 @@ export default function Dashboard() {
           ) : (
             <div className="text-center py-6">
               <p className="text-gray-500 mb-4">No attendance data available</p>
-              
+
               {/* Default Stats for No Data */}
               <div className="space-y-3 max-w-xs mx-auto">
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
@@ -918,61 +944,38 @@ export default function Dashboard() {
           )}
         </div>
 
+       
         {/* Daily Ritual Card */}
-        {/* Daily Ritual Card */}
-        <div className="mx-4 mb-6 bg-purple-100 rounded-xl p-4 flex items-center justify-between shadow-sm border border-purple-200">
-          {/* Left Side */}
-          <div className="flex items-center gap-3">
-            <div className="bg-purple-200 text-purple-600 p-2 rounded-lg">
-              <Gift className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-purple-700">
-                Invite 1st friend
-              </h3>
-              <p className="text-xs text-purple-500">
-                Win +100 karma points
-              </p>
-            </div>
-          </div>
-
-          {/* Right Side Button */}
-          <button
-            onClick={() => setActiveTab("referral")}
-            className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
-          >
-            Send Invite
-          </button>
-        </div>
-
-
-        <div className="mx-4 mb-6 rounded-2xl bg-yellow-50 p-[1px] shadow-lg">
-
-          {/* Today's Instruction */}
-          <div className="rounded-xl p-4 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              <p className="text-xs font-medium text-gray-600">
-                Today's Focus - {todayInstruction?.day_name || new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-              </p>
-            </div>
-
-            {instructionsLoading ? (
-              <div className="flex items-center justify-center py-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+        <div className="mx-4 mb-6 rounded-xl">
+          <h2 className="mx-1.5 font-semibold my-2 text-gray-700">Start with Daily Ritual </h2>
+          <div className=" bg-purple-100 rounded-xl p-4 flex items-center justify-between shadow-sm border border-purple-200">
+            {/* Left Side */}
+            <div className="flex items-center gap-3">
+              <div className="bg-purple-200 text-purple-600 p-2 rounded-lg">
+                <Gift className="w-5 h-5" />
               </div>
-            ) : todayInstruction ? (
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {todayInstruction.instruction}
-              </p>
-            ) : (
-              <p className="text-sm text-gray-400 italic">
-                No instruction available for today
-              </p>
-            )}
-          </div>
+              <div>
+                <h3 className="text-sm font-bold text-purple-700">
+                  Invite 1 new friend today
+                </h3>
+                <p className="text-xs text-purple-500">
+                  Win your 100 karma points
+                </p>
+              </div>
+            </div>
 
+            {/* Right Side Button */}
+            <button
+              onClick={() => setActiveTab("referral")}
+              className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
+            >
+              Send Invite
+            </button>
+          </div>
         </div>
+
+
+
 
 
         {/* Today's Classes */}
