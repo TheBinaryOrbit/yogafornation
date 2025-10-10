@@ -19,28 +19,65 @@ const Login = () => {
     })
     const [selectedCountry, setSelectedCountry] = useState({
         code: "IN",
-        dialCode: "+91"
+        dialCode: "+91",
+        name: "India",
+        flag: "https://flagcdn.com/w320/in.png"
     })
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
-    // Country codes data
+    // Country codes data with flag URLs
     const countryCodes = [
-        { code: "IN", dialCode: "+91", name: "India" },
-        { code: "US", dialCode: "+1", name: "United States" },
-        { code: "GB", dialCode: "+44", name: "United Kingdom" },
-        { code: "CA", dialCode: "+1", name: "Canada" },
-        { code: "AU", dialCode: "+61", name: "Australia" },
-        { code: "DE", dialCode: "+49", name: "Germany" },
-        { code: "FR", dialCode: "+33", name: "France" },
-        { code: "JP", dialCode: "+81", name: "Japan" },
-        { code: "SG", dialCode: "+65", name: "Singapore" },
-        { code: "AE", dialCode: "+971", name: "UAE" },
-        { code: "SA", dialCode: "+966", name: "Saudi Arabia" },
-        { code: "MY", dialCode: "+60", name: "Malaysia" },
-        { code: "TH", dialCode: "+66", name: "Thailand" },
-        { code: "ID", dialCode: "+62", name: "Indonesia" },
-        { code: "PH", dialCode: "+63", name: "Philippines" }
+        { code: "IN", dialCode: "+91", name: "India", flag: "https://flagcdn.com/w320/in.png" },
+        { code: "US", dialCode: "+1", name: "United States", flag: "https://flagcdn.com/w320/us.png" },
+        { code: "GB", dialCode: "+44", name: "United Kingdom", flag: "https://flagcdn.com/w320/gb.png" },
+        { code: "CA", dialCode: "+1", name: "Canada", flag: "https://flagcdn.com/w320/ca.png" },
+        { code: "AU", dialCode: "+61", name: "Australia", flag: "https://flagcdn.com/w320/au.png" },
+        { code: "DE", dialCode: "+49", name: "Germany", flag: "https://flagcdn.com/w320/de.png" },
+        { code: "FR", dialCode: "+33", name: "France", flag: "https://flagcdn.com/w320/fr.png" },
+        { code: "JP", dialCode: "+81", name: "Japan", flag: "https://flagcdn.com/w320/jp.png" },
+        { code: "SG", dialCode: "+65", name: "Singapore", flag: "https://flagcdn.com/w320/sg.png" },
+        { code: "AE", dialCode: "+971", name: "UAE", flag: "https://flagcdn.com/w320/ae.png" },
+        { code: "SA", dialCode: "+966", name: "Saudi Arabia", flag: "https://flagcdn.com/w320/sa.png" },
+        { code: "MY", dialCode: "+60", name: "Malaysia", flag: "https://flagcdn.com/w320/my.png" },
+        { code: "TH", dialCode: "+66", name: "Thailand", flag: "https://flagcdn.com/w320/th.png" },
+        { code: "ID", dialCode: "+62", name: "Indonesia", flag: "https://flagcdn.com/w320/id.png" },
+        { code: "PH", dialCode: "+63", name: "Philippines", flag: "https://flagcdn.com/w320/ph.png" },
+        { code: "CN", dialCode: "+86", name: "China", flag: "https://flagcdn.com/w320/cn.png" },
+        { code: "BR", dialCode: "+55", name: "Brazil", flag: "https://flagcdn.com/w320/br.png" },
+        { code: "MX", dialCode: "+52", name: "Mexico", flag: "https://flagcdn.com/w320/mx.png" },
+        { code: "RU", dialCode: "+7", name: "Russia", flag: "https://flagcdn.com/w320/ru.png" },
+        { code: "IT", dialCode: "+39", name: "Italy", flag: "https://flagcdn.com/w320/it.png" },
+        { code: "ES", dialCode: "+34", name: "Spain", flag: "https://flagcdn.com/w320/es.png" },
+        { code: "KR", dialCode: "+82", name: "South Korea", flag: "https://flagcdn.com/w320/kr.png" },
+        { code: "TR", dialCode: "+90", name: "Turkey", flag: "https://flagcdn.com/w320/tr.png" },
+        { code: "AR", dialCode: "+54", name: "Argentina", flag: "https://flagcdn.com/w320/ar.png" },
+        { code: "ZA", dialCode: "+27", name: "South Africa", flag: "https://flagcdn.com/w320/za.png" },
+        { code: "EG", dialCode: "+20", name: "Egypt", flag: "https://flagcdn.com/w320/eg.png" },
+        { code: "NG", dialCode: "+234", name: "Nigeria", flag: "https://flagcdn.com/w320/ng.png" },
+        { code: "KE", dialCode: "+254", name: "Kenya", flag: "https://flagcdn.com/w320/ke.png" },
+        { code: "BD", dialCode: "+880", name: "Bangladesh", flag: "https://flagcdn.com/w320/bd.png" },
+        { code: "PK", dialCode: "+92", name: "Pakistan", flag: "https://flagcdn.com/w320/pk.png" },
+        { code: "LK", dialCode: "+94", name: "Sri Lanka", flag: "https://flagcdn.com/w320/lk.png" },
+        { code: "NP", dialCode: "+977", name: "Nepal", flag: "https://flagcdn.com/w320/np.png" },
+        { code: "MM", dialCode: "+95", name: "Myanmar", flag: "https://flagcdn.com/w320/mm.png" },
+        { code: "VN", dialCode: "+84", name: "Vietnam", flag: "https://flagcdn.com/w320/vn.png" },
+        { code: "NL", dialCode: "+31", name: "Netherlands", flag: "https://flagcdn.com/w320/nl.png" },
+        { code: "BE", dialCode: "+32", name: "Belgium", flag: "https://flagcdn.com/w320/be.png" },
+        { code: "CH", dialCode: "+41", name: "Switzerland", flag: "https://flagcdn.com/w320/ch.png" },
+        { code: "AT", dialCode: "+43", name: "Austria", flag: "https://flagcdn.com/w320/at.png" },
+        { code: "SE", dialCode: "+46", name: "Sweden", flag: "https://flagcdn.com/w320/se.png" },
+        { code: "NO", dialCode: "+47", name: "Norway", flag: "https://flagcdn.com/w320/no.png" },
+        { code: "DK", dialCode: "+45", name: "Denmark", flag: "https://flagcdn.com/w320/dk.png" },
+        { code: "FI", dialCode: "+358", name: "Finland", flag: "https://flagcdn.com/w320/fi.png" },
+        { code: "PL", dialCode: "+48", name: "Poland", flag: "https://flagcdn.com/w320/pl.png" },
+        { code: "CZ", dialCode: "+420", name: "Czech Republic", flag: "https://flagcdn.com/w320/cz.png" },
+        { code: "HU", dialCode: "+36", name: "Hungary", flag: "https://flagcdn.com/w320/hu.png" },
+        { code: "GR", dialCode: "+30", name: "Greece", flag: "https://flagcdn.com/w320/gr.png" },
+        { code: "PT", dialCode: "+351", name: "Portugal", flag: "https://flagcdn.com/w320/pt.png" },
+        { code: "IE", dialCode: "+353", name: "Ireland", flag: "https://flagcdn.com/w320/ie.png" },
+        { code: "IL", dialCode: "+972", name: "Israel", flag: "https://flagcdn.com/w320/il.png" },
+        { code: "NZ", dialCode: "+64", name: "New Zealand", flag: "https://flagcdn.com/w320/nz.png" }
     ]
 
     useEffect(() => {
@@ -161,17 +198,33 @@ const Login = () => {
                         {/* Phone Input */}
                         <div className="relative">
                             <div className="flex mt-10">
-                                <select
-                                    value={selectedCountry.code}
-                                    onChange={handleCountryChange}
-                                    className="px-3 py-3 border border-gray-300 rounded-l-lg bg-gray-100 text-sm font-medium focus:ring-2 focus:ring-green-500 focus:border-green-500 min-w-[80px]"
-                                >
-                                    {countryCodes.map((country) => (
-                                        <option key={country.code} value={country.code}>
-                                            {country.code} {country.dialCode}
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={selectedCountry.code}
+                                        onChange={handleCountryChange}
+                                        className="p-3 pl-12 pr-0 border border-gray-300 rounded-l-lg bg-gray-100 text-sm font-medium focus:ring-2 focus:ring-green-500 focus:border-green-500 min-w-[90px] appearance-none"
+                                    >
+                                        {countryCodes.map((country) => (
+                                            <>
+                                            <img
+                                            src={selectedCountry.flag}
+                                            alt={selectedCountry.name}
+                                            className="h-6 w-8 object-cover rounded-sm border border-gray-200"
+                                        />
+                                            <option key={country.code} value={country.code}>
+                                                {country.dialCode}
+                                            </option>
+                                        </>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <img
+                                            src={selectedCountry.flag}
+                                            alt={selectedCountry.name}
+                                            className="h-6 w-8 object-cover rounded-sm border border-gray-200"
+                                        />
+                                    </div>
+                                </div>
                                 <input
                                     type="tel"
                                     name="phonenumber"
@@ -182,9 +235,7 @@ const Login = () => {
                                     required
                                 />
                             </div>
-                            <div className="text-xs text-gray-500 mt-1 ml-1">
-                                Selected: {selectedCountry.name} ({selectedCountry.dialCode})
-                            </div>
+                            
                         </div>
 
                         {/* Password Input */}

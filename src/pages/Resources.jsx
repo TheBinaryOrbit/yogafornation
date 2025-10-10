@@ -356,7 +356,7 @@ export default function Resources() {
                 </div>
               </div>
             ) : dietPlans.length > 0 ? (
-              dietPlans.map((plan) => (
+              dietPlans.filter((plan) => plan.isPrivate === false).map((plan) => (
                 <div key={plan.id} className="bg-white rounded-lg p-4 shadow-sm flex gap-4">
                   <div className="relative">
                     <img

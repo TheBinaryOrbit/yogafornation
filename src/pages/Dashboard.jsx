@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart, AlignEndHorizontal, Star, HomeIcon  , ArrowLeft } from "lucide-react"
+import { Menu, Play, Clock, CheckCircle, Copy, Share, Home, BookOpen, Users, ChevronRight, Gift, User, X, LogOut, Edit3, Heart, AlignEndHorizontal, Star, HomeIcon, ArrowLeft, Download } from "lucide-react"
 
 import Resources from "./Resources"
 import useGetuser from "../hooks/user"
@@ -11,6 +11,7 @@ import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { useDashboard } from '../contexts/DashboardContext'
 import img from '../assets/qrcodecopy.png'
+import DownloadPdf from "./DownloadPdf"
 export default function Dashboard() {
   // Rating modal state
   const [showRatingModal, setShowRatingModal] = useState(false);
@@ -38,6 +39,41 @@ export default function Dashboard() {
   const [leaderboard, setLeaderboard] = useState(null)
   const [leaderboardLoading, setLeaderboardLoading] = useState(false)
   const [leaderboardError, setLeaderboardError] = useState(false)
+  const [showRewards, setShowRewards] = useState(false)
+
+  // Referral rewards data
+  const rewardsData = [
+    {
+      level: 1,
+      invites: 5,
+      reward: "Unlock an exclusive PDF guide to meditation and mindfulness.",
+      icon: "📚"
+    },
+    {
+      level: 2,
+      invites: 10,
+      reward: "Get access to a premium short course created by our founder.",
+      icon: "🎓"
+    },
+    {
+      level: 3,
+      invites: 25,
+      reward: "Receive a special Yoga for Nation T-shirt.",
+      icon: "👕"
+    },
+    {
+      level: 4,
+      invites: 50,
+      reward: "Get exclusive early access to all new resources and upcoming challenges.",
+      icon: "⭐"
+    },
+    {
+      level: 5,
+      invites: 100,
+      reward: "Participate in a private live Q&A session with our senior instructors.",
+      icon: "🎯"
+    }
+  ]
 
 
   useEffect(() => {
@@ -626,12 +662,171 @@ export default function Dashboard() {
     }
 
     if (activeTab === "referral") {
+      // Rewards Journey Screen
+      if (showRewards) {
+        const currentReferrals = referralData?.total_referrals || 0;
+
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
+            {/* Header */}
+            {/* <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm border-b border-gray-200">
+              <div className="flex items-center justify-between p-4">
+                <button
+                  onClick={() => {
+                    console.log("Back button clicked");
+                    setShowRewards(false);
+                  }}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  <span className="font-medium">Back</span>
+                </button>
+                <h1 className="text-lg font-bold text-gray-800">Your Rewards Journey</h1>
+                <div className="w-16"></div>
+              </div>
+            </div> */}
+
+            <div className="px-4 py-6">
+              {/* Journey Description */}
+              <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                <div className="text-center mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Gift className="w-8 h-8 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Your Rewards Journey</h2>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    See your progress and unlock exclusive benefits as you help grow our movement.
+                  </p>
+                </div>
+
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600">Current Referrals</p>
+                      <p className="text-2xl font-bold text-indigo-600">{currentReferrals}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600">Friends get:</p>
+                      <p className="text-sm font-semibold text-green-600">Life-long access to free daily yoga classes</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-700">You earn exclusive rewards for each milestone!</p>
+                </div>
+              </div>
+
+              {/* Rewards Levels */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold text-gray-800 px-2">Levels & Rewards</h3>
+
+                {rewardsData.map((reward, index) => {
+                  const isUnlocked = currentReferrals >= reward.invites;
+                  const isNext = !isUnlocked && (index === 0 || currentReferrals >= rewardsData[index - 1].invites);
+
+                  return (
+                    <div
+                      key={reward.level}
+                      className={`relative rounded-2xl p-6 transition-all duration-300 ${isUnlocked
+                          ? 'bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 shadow-lg'
+                          : isNext
+                            ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 shadow-md'
+                            : 'bg-gray-50 border-2 border-gray-200'
+                        }`}
+                    >
+                      {/* Unlock Badge */}
+                      {isUnlocked && (
+                        <div className="absolute -top-3 -right-3 bg-green-500 text-white rounded-full p-2 shadow-lg">
+                          <CheckCircle className="w-5 h-5" />
+                        </div>
+                      )}
+
+                      {isNext && (
+                        <div className="absolute -top-3 -right-3 bg-yellow-500 text-white rounded-full p-2 shadow-lg animate-pulse">
+                          <Star className="w-5 h-5" />
+                        </div>
+                      )}
+
+                      <div className="flex items-start gap-4">
+                        {/* Level Icon */}
+                        <div className={`flex-shrink-0 w-16 h-16 rounded-xl flex items-center justify-center text-2xl ${isUnlocked
+                            ? 'bg-green-200'
+                            : isNext
+                              ? 'bg-yellow-200'
+                              : 'bg-gray-200'
+                          }`}>
+                          {reward.icon}
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className={`text-lg font-bold ${isUnlocked ? 'text-green-800' : isNext ? 'text-yellow-800' : 'text-gray-500'
+                              }`}>
+                              Level {reward.level}
+                            </h4>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${isUnlocked
+                                ? 'bg-green-200 text-green-800'
+                                : isNext
+                                  ? 'bg-yellow-200 text-yellow-800'
+                                  : 'bg-gray-200 text-gray-600'
+                              }`}>
+                              {reward.invites} invites
+                            </span>
+                          </div>
+
+                          <p className={`text-sm leading-relaxed ${isUnlocked ? 'text-green-700' : isNext ? 'text-yellow-700' : 'text-gray-500'
+                            }`}>
+                            {reward.reward}
+                          </p>
+
+                          {/* Progress indicator for next level */}
+                          {isNext && (
+                            <div className="mt-3">
+                              <div className="flex items-center justify-between text-xs text-yellow-700 mb-1">
+                                <span>Progress</span>
+                                <span>{currentReferrals}/{reward.invites}</span>
+                              </div>
+                              <div className="w-full bg-yellow-200 rounded-full h-2">
+                                <div
+                                  className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                                  style={{ width: `${Math.min((currentReferrals / reward.invites) * 100, 100)}%` }}
+                                ></div>
+                              </div>
+                              <p className="text-xs text-yellow-600 mt-1">
+                                {reward.invites - currentReferrals} more referrals to unlock!
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // Normal referral tab content
       return (
         <div className="px-4 py-6">
           {/* Referral Rewards Header */}
           <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">Referral Rewards</h2>
+              <button
+                onClick={() => {
+                  console.log("View Rewards button clicked");
+                  setShowRewards(true);
+                }}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              >
+                <Gift className="w-4 h-4" />
+                View Rewards
+              </button>
             </div>
 
             <div className="mb-4">
@@ -944,7 +1139,12 @@ export default function Dashboard() {
           )}
         </div>
 
-       
+        <DownloadPdf
+          userId={user.id}
+          primaryGoal={user.primaryGoal}
+        />
+
+
         {/* Daily Ritual Card */}
         <div className="mx-4 mb-6 rounded-xl">
           <h2 className="mx-1.5 font-semibold my-2 text-gray-700">Start with Daily Ritual </h2>
@@ -1167,7 +1367,7 @@ export default function Dashboard() {
             <h3 className="text-lg font-semibold text-white">Contribute to Our Mission</h3>
             <h3 className="text-md font-semibold text-white ">🙏Support via UPI</h3>
             <h3 className="text-md font-semibold text-white mb-4">UPI : yogafornation@barodampay</h3>
-            
+
             {/* QR Code Section */}
             <div className="bg-white rounded-lg p-4 mb-4 inline-block">
               <img
@@ -1177,7 +1377,7 @@ export default function Dashboard() {
               />
               <p className="text-xs text-gray-600 mt-2">Scan to Donate</p>
             </div>
-            
+
             {/* Donate Button */}
             <button
               onClick={() => navigate('/donations')}

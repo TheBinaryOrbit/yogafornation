@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Plus, Trash2, FileText, Users, Crown, Gift, X, Download, Eye } from "lucide-react"
+import { Plus, Trash2, FileText, Users, Crown, Gift, X, Download, Eye , Lock , User } from "lucide-react"
 import axios from "axios"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
@@ -19,7 +19,8 @@ export default function ResourceManagement() {
     description: "",
     type: "free",
     karma_points_required: 0,
-    user_id: null
+    user_id: null,
+    isPrivate: false
   })
 
   const fetchDietPlans = async () => {
@@ -97,6 +98,7 @@ export default function ResourceManagement() {
       formDataUpload.append('type', formData.type)
       formDataUpload.append('karma_points', formData.type === 'karma' ? formData.karma_points_required : 0)
       formDataUpload.append('user_id', formData.type === 'personalized' ? formData.user_id : '')
+      formDataUpload.append('isPrivate', formData.isPrivate)
       if (selectedFile) {
         formDataUpload.append('media_url', selectedFile)
       }
@@ -226,7 +228,8 @@ export default function ResourceManagement() {
       description: "",
       type: "free",
       karma_points_required: 0,
-      user_id: null
+      user_id: null,
+      isPrivate: false
     })
     setSelectedFile(null)
     setSelectedThumbnail(null)
@@ -240,7 +243,8 @@ export default function ResourceManagement() {
       description: "",
       type: "free",
       karma_points_required: 0,
-      user_id: null
+      user_id: null,
+      isPrivate: false
     })
     setSelectedFile(null)
     setSelectedThumbnail(null)
@@ -377,9 +381,13 @@ export default function ResourceManagement() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(plan.type)}`}>
+                        <span className={`inline-flex mr-3 items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeColor(plan.type)}`}>
                           {getTypeIcon(plan.type)}
                           {plan.type}
+                        </span>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800`}>
+                          {plan?.isPrivate ? <Lock className="h-4 w-4" /> : <Users className="h-4 w-4" />}
+                          {plan?.isPrivate ? 'Private' : 'Public'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -501,6 +509,22 @@ export default function ResourceManagement() {
                     <option value="karma">Karma</option>
                     <option value="personalized">Personalized</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="isPrivate"
+                      checked={formData.isPrivate}
+                      onChange={(e) => setFormData(prev => ({ ...prev, isPrivate: e.target.checked }))}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">Private Diet Plan</span>
+                      <p className="text-xs text-gray-500">Make this diet plan private and accessible only to specific users</p>
+                    </div>
+                  </label>
                 </div>
 
                 {formData.type === 'karma' && (
