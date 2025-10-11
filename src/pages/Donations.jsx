@@ -27,10 +27,10 @@ export default function Donations() {
 
     // Predefined donation amounts
     const predefinedAmounts = [
-        { amount: 100, type: "Sewa", description: "Support daily operations" },
-        { amount: 501, type: "Sahayog", description: "Help community programs" },
-        { amount: 1100, type: "Samarpan", description: "Full dedication support" },
-        { amount: 2100, type: "Sankalp", description: "Extended community support" },
+        { amount: 101, type: "Sewa", description: "A small act of selfless service" },
+        { amount: 501, type: "Sahayog", description: " An act of collaboration and support" },
+        { amount: 1100, type: "Samarpan", description: "An act of complete dedication" },
+        { amount: 2100, type: "Sankalp", description: "A determined resolution for growth and support" },
     ]
 
     useEffect(() => {
@@ -502,7 +502,7 @@ export default function Donations() {
 
                         {/* Custom Amount */}
                         <div className="mb-6">
-                            <h3 className="font-semibold text-gray-800 mb-3">अपनी श्रद्धा से योगदान दें।</h3>
+                            <h3 className="font-semibold text-gray-800 mb-3">Contribute as you wish (अपनी श्रद्धा से योगदान दें।)</h3>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
                                 <input
@@ -613,7 +613,7 @@ export default function Donations() {
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-gray-600">Karma Points:</span>
-                                        <span className="font-medium text-green-600">~{amount || customAmount}</span>
+                                        <span className="font-medium text-green-600">{amount || customAmount}</span>
                                     </div>
                                 </div>
                             </div>
@@ -684,7 +684,7 @@ export default function Donations() {
                                     Processing...
                                 </div>
                             ) : (
-                                `Donate ₹${amount || customAmount || 0}`
+                                `Donate Now`
                             )}
                         </button>
                     </>

@@ -51,11 +51,6 @@ const CallToActionSection = () => {
           </div>
           </Link>
 
-          {/* "Already attended" text with bold, light blue numbers */}
-          <p className="mt-8 text-sm leading-6 text-gray-400"> {/* Increased margin-top for more space */}
-            <span className="font-bold text-[#00C9FF]">1.24 Crore +</span> already attended
-          </p>
-
         </div>
       </div>
     </section>

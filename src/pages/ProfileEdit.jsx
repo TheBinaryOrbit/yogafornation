@@ -201,24 +201,6 @@ const ProfileEdit = () => {
 
                             <div className="space-y-4 p-4">
 
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
-                                        <User className="w-4 h-4 text-gray-400" />
-                                        User Id
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={`YNF-${formData.user_id}`}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter your full name"
-                                        className="w-full p-4 border border-gray-200 bg-gray-200 rounded-xl "
-                                        required
-                                        readOnly
-
-                                    />
-                                </div>
-
 
                                 {/* Name */}
                                 <div className="space-y-2">
