@@ -508,7 +508,7 @@ const Register = () => {
                                     placeholder="Enter Phone Number"
                                     value={formData.phonenumber}
                                     onChange={handleInputChange}
-                                    className="flex-1 block w-full pl-3 pr-3 py-3 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    className="flex-1 block w-full pl-3 pr-3 py-2 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     required
                                 />
                             </div>
