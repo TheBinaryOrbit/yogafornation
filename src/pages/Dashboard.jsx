@@ -40,7 +40,7 @@ export default function Dashboard() {
   const [leaderboardLoading, setLeaderboardLoading] = useState(false)
   const [leaderboardError, setLeaderboardError] = useState(false)
   const [showRewards, setShowRewards] = useState(false)
-   const [showInstructions, setShowInstructions] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   // Referral rewards data
   const rewardsData = [
@@ -538,6 +538,21 @@ export default function Dashboard() {
 
   }
 
+  const formatUserId = (createdAt, id) => {
+    // Convert string date to JS Date object
+    const date = new Date(createdAt);
+
+    // Extract last 2 digits of year
+    const year = String(date.getFullYear()).slice(-2);
+    // Month and date with zero padding
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    // Combine into the desired format
+    return `YFN-${year}${month}${day}${id}`;
+  }
+
+
   const renderContent = () => {
     if (activeTab === "resources") {
       return <Resources />
@@ -810,7 +825,7 @@ export default function Dashboard() {
           </div>
         );
       }
-     
+
       // Normal referral tab content
       return (
         <div className="px-4 py-6">
@@ -870,9 +885,9 @@ export default function Dashboard() {
                       <span className="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center text-xs font-semibold">3</span>
                       <p><strong>Earn karma points</strong>  when they join our community! </p>
                     </div>
-                    
+
                   </div>
-              
+
                 </div>
               )}
             </div>
@@ -1168,10 +1183,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <DownloadPdf
-          userId={user.id}
-          primaryGoal={user.primaryGoal}
-        />
+
 
 
         {/* Daily Ritual Card */}
@@ -1350,6 +1362,14 @@ export default function Dashboard() {
           )}
         </div>
 
+
+
+        <DownloadPdf
+          userId={user.id}
+          primaryGoal={user.primaryGoal}
+        />
+        <div className="mb-4"></div>
+
         {/* Join Telegram Community Card */}
         <div className="mx-5 mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between">
@@ -1365,6 +1385,7 @@ export default function Dashboard() {
             </div>
 
           </div>
+
           <div className="flex justify-center items-center gap-4">
             <button
               onClick={() => window.open('https://t.me/yogafornation', '_blank')}
@@ -1544,7 +1565,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
-                window.history.back();
+                window.location.href = "/";
               }}
               className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
             >
@@ -1553,7 +1574,7 @@ export default function Dashboard() {
             <div onClick={() => navigate("/profile-edit")} className="cursor-pointer">
 
               <p className="font-semibold text-gray-800">Namaste,{userProfile?.name || "Loading..."} Ji</p>
-              <p className="text-xs text-gray-900 font-semibold">ID-{userProfile?.id}</p>
+              <p className="text-xs text-gray-900 font-semibold">ID-{formatUserId(userProfile?.created_at, userProfile?.id)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">

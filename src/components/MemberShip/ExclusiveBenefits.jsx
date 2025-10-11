@@ -5,7 +5,9 @@ const benefits = [
   {
     name: 'Guided Practice',
     description: 'Stay on the right path with clear, expert-led sessions. Our instructors provide personalized guidance, ensuring you practice safely and effectively from day one.',
-    icon: (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.5c-.69 0-1.25-.56-1.25-1.25V9.5c0-.69.56-1.25 1.25-1.25H6.75z" /></svg>),
+    icon: (<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-headphones" viewBox="0 0 16 16">
+      <path d="M8 3a5 5 0 0 0-5 5v1h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V8a6 6 0 1 1 12 0v5a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1V8a5 5 0 0 0-5-5" />
+    </svg>),
     iconBgColor: 'bg-blue-100',
     iconTextColor: 'text-blue-600',
   },
@@ -62,13 +64,13 @@ const ExclusiveBenefits = () => {
             At Yoga for Nation, we are dedicated to making yoga accessible and enjoyable for everyone. Discover what makes our free yoga movement special:
           </p>
         </div>
-        
+
         <div className="max-w-2xl mx-auto mt-16 sm:mt-20 lg:mt-24 lg:max-w-none">
           <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 md:grid-cols-2 lg:max-w-none lg:grid-cols-3 lg:gap-y-16">
             {benefits.map((feature) => (
               // HOVER EFFECT ADDED: Added padding, negative margin, transition, and a light blue background on hover.
-              <div 
-                key={feature.name} 
+              <div
+                key={feature.name}
                 className="relative flex items-start p-4 -m-4 transition-colors duration-300 ease-in-out rounded-xl hover:bg-sky-50"
               >
                 <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg ${feature.iconBgColor}`}>

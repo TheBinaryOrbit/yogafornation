@@ -26,6 +26,19 @@ const ProfileEdit = () => {
         phonenumber: ""
     });
 
+    // Helper function to convert yyyymmdd to yyyy-mm-dd for date input
+    const formatDateForInput = (yyyymmdd) => {
+        if (!yyyymmdd || yyyymmdd.toString().length !== 8) return "";
+        const str = yyyymmdd.toString();
+        return `${str.substring(0, 4)}-${str.substring(4, 6)}-${str.substring(6, 8)}`;
+    };
+
+    // Helper function to convert yyyy-mm-dd to yyyymmdd integer
+    const formatDateForSubmission = (dateStr) => {
+        if (!dateStr) return "";
+        return parseInt(dateStr.replace(/-/g, ''));
+    };
+
     useEffect(() => {
         if (!user) {
             navigate("/login");
@@ -60,7 +73,7 @@ const ProfileEdit = () => {
                     name: userData.name || "",
                     gender: userData.gender || "",
                     city: userData.city || "",
-                    birtyear: userData.birtyear || "",
+                    birtyear: formatDateForInput(userData.birtyear) || "",
                     email: userData.email || "",
                     primarygoal: userData.primarygoal || "",
                     phonenumber: userData.phonenumber || ""
@@ -97,7 +110,13 @@ const ProfileEdit = () => {
                 return;
             }
 
-            const response = await axios.put("https://lightsteelblue-woodcock-286554.hostingersite.com/api/profile", formData, {
+            // Convert date to yyyymmdd format for submission
+            const submissionData = {
+                ...formData,
+                birtyear: formatDateForSubmission(formData.birtyear)
+            };
+
+            const response = await axios.put("https://lightsteelblue-woodcock-286554.hostingersite.com/api/profile", submissionData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -115,7 +134,7 @@ const ProfileEdit = () => {
                     name: response.data.user.name || "",
                     gender: response.data.user.gender || "",
                     city: response.data.user.city || "",
-                    birtyear: response.data.user.birtyear || "",
+                    birtyear: formatDateForInput(response.data.user.birtyear) || "",
                     email: response.data.user.email || "",
                     primarygoal: response.data.user.primarygoal || ""
                 });
@@ -149,9 +168,6 @@ const ProfileEdit = () => {
         "Mindfulness",
         "Overall health"
     ];
-
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
 
     return (
         <div className="min-h-screen max-w-md mx-auto">
@@ -206,7 +222,7 @@ const ProfileEdit = () => {
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
                                         <User className="w-4 h-4 text-gray-400" />
-                                        Full Name
+                                        Full Name <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -223,7 +239,7 @@ const ProfileEdit = () => {
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
                                         <Phone className="w-4 h-4 text-gray-400" />
-                                        Phone Number
+                                        Phone Number<span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="tel"
@@ -240,7 +256,7 @@ const ProfileEdit = () => {
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
                                         <Mail className="w-4 h-4 text-gray-400" />
-                                        Email Address
+                                        Email Address<span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="email"
@@ -249,6 +265,7 @@ const ProfileEdit = () => {
                                         onChange={handleInputChange}
                                         placeholder="Enter your email address"
                                         className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                        required
                                     />
                                 </div>
                             </div>
@@ -269,13 +286,14 @@ const ProfileEdit = () => {
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
                                         <User className="w-4 h-4 text-gray-400" />
-                                        Gender
+                                        Gender<span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         name="gender"
                                         value={formData.gender}
                                         onChange={handleInputChange}
                                         className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white appearance-none"
+                                        required
                                     >
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
@@ -288,7 +306,7 @@ const ProfileEdit = () => {
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
                                         <MapPin className="w-4 h-4 text-gray-400" />
-                                        City
+                                        City<span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -297,39 +315,39 @@ const ProfileEdit = () => {
                                         onChange={handleInputChange}
                                         placeholder="Enter your city"
                                         className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                        required
                                     />
                                 </div>
 
-                                {/* Birth Year */}
+                                {/* Date of Birth */}
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
                                         <Calendar className="w-4 h-4 text-gray-400" />
-                                        Birth Year
+                                        Date of Birth<span className="text-red-500">*</span>
                                     </label>
-                                    <select
+                                    <input
+                                        type="date"
                                         name="birtyear"
                                         value={formData.birtyear}
                                         onChange={handleInputChange}
-                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white appearance-none"
-                                    >
-                                        <option value="">Select Birth Year</option>
-                                        {years.map(year => (
-                                            <option key={year} value={year}>{year}</option>
-                                        ))}
-                                    </select>
+                                        className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                        max={new Date().toISOString().split('T')[0]}
+                                        required
+                                    />
                                 </div>
 
                                 {/* Primary Goal */}
                                 <div className="space-y-2">
                                     <label className="flex items-center gap-2 text-gray-700 font-medium text-sm">
                                         <Target className="w-4 h-4 text-gray-400" />
-                                        Primary Goal
+                                        Primary Goal<span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         name="primarygoal"
                                         value={formData.primarygoal}
                                         onChange={handleInputChange}
                                         className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white appearance-none"
+                                        required
                                     >
                                         <option value="">Select Your Primary Goal</option>
                                         {goals.map(goal => (
