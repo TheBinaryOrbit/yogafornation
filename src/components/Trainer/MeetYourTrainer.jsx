@@ -59,16 +59,17 @@ const MeetYourTrainer = () => {
             A New Approach to Yoga
           </p>
         </div>
-        <div className="mt-16 space-y-20 lg:mt-24 lg:space-y-24">
+        <div className="mt-16 space-y-20 lg:mt-24 lg:space-y-24 ">
           {trainers.map((trainer) => (
-            <div key={trainer.name} className="grid items-center grid-cols-1 gap-y-10 gap-x-16 lg:grid-cols-2">
+            <div key={trainer.name} className="relative grid items-center grid-cols-1 gap-y-10 gap-x-16 lg:grid-cols-2">
               <div className={trainer.imagePosition === 'right' ? 'lg:order-last' : ''}>
                 <img
-                  className="object-cover w-full h-auto rounded-lg"
+                  className="object-cover w-full h-auto rounded-lg mb-4"
                   src={trainer.imageSrc}
                   alt={`Trainer ${trainer.name}`}
                 />
               </div>
+              <p className='absolute bottom-0 text-2xl font-bold text-teal-600'>Lovnish Gupta CEO & Founder, Yoga for Nation</p>
               <div>
                 <h3 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
                   {trainer.program} with {trainer.name}
