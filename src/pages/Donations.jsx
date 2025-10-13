@@ -27,10 +27,10 @@ export default function Donations() {
 
     // Predefined donation amounts
     const predefinedAmounts = [
-        { amount: 101, type: "Sewa", description: "A small act of selfless service" },
-        { amount: 501, type: "Sahayog", description: " An act of collaboration and support" },
-        { amount: 1100, type: "Samarpan", description: "An act of complete dedication" },
-        { amount: 2100, type: "Sankalp", description: "A determined resolution for growth and support" },
+        { amount: 101, type: "सेवा (Service)", description: "A small act of selfless service" },
+        { amount: 501, type: "सहयोग (Support)", description: " An act of collaboration and support" },
+        { amount: 1100, type: "समर्पण (Dedication)", description: "An act of complete dedication" },
+        { amount: 2100, type: "संकल्प (Resolve)", description: "A determined resolution for growth and support" },
     ]
 
     useEffect(() => {

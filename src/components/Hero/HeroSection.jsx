@@ -88,7 +88,7 @@ const HeroSection = () => {
             <Link to="/register">
               <button
                 type="button"
-                className="inline-flex items-center justify-center px-8 py-4 text-xl font-semibold text-white transition-transform duration-200 bg-teal-500 rounded-full shadow-lg hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+                className="inline-flex items-center justify-center px-8 py-4 text-xl font-semibold text-white transition-transform duration-200 bg-[#1D6F42] rounded-full shadow-lg hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
               >
                 {heroData.button_text}
                 <svg

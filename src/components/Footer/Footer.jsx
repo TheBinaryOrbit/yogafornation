@@ -41,7 +41,7 @@ const navigation = {
 const Footer = () => {
   return (
     // Replaced the gradient with a solid, calming dark teal color
-    <footer className="bg-teal-700 text-white" aria-labelledby="footer-heading">
+    <footer className="bg-[#1D6F42]  text-white" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">Footer</h2>
       <div className="mx-auto max-w-7xl px-6 py-8 sm:py- lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -51,13 +51,13 @@ const Footer = () => {
             <div className="flex items-center space-x-3">
               <img className="h-28 w-auto" src={logoImage} alt="Yoga For Nation" />
             </div>
-            <div className='flex flex-col justify-start items-start gap-2 text-lg text-teal-200'>
-              <p className='flex justify-center items-center'><MapPin className="h-5 w-5 text-teal-300" />&nbsp;Address: Delhi, India</p>
-              <p className='flex justify-center items-center'><Phone className="h-5 w-5 text-teal-300" />&nbsp;Phone: +91 92500 73500</p>
+            <div className='flex flex-col justify-start items-start gap-2 text-lg text-white'>
+              <p className='flex justify-center items-center'><MapPin className="h-5 w-5 text-white " />&nbsp;Address: Delhi, India</p>
+              <p className='flex justify-center items-center'><Phone className="h-5 w-5 text-white " />&nbsp;Phone: +91 92500 73500</p>
             </div>
             <div className="flex space-x-4 pt-2">
               {navigation.social.map((item) => (
-                <a key={item.name} href={item.href} className="text-teal-200 hover:text-white transition-colors duration-200" target="_blank" rel="noopener noreferrer">
+                <a key={item.name} href={item.href} className="text-white hover:text-white transition-colors duration-200" target="_blank" rel="noopener noreferrer">
                   <span className="sr-only">{item.name}</span>
                   <item.icon className="h-6 w-6" aria-hidden="true" />
                 </a>
@@ -71,7 +71,7 @@ const Footer = () => {
             <ul role="list" className="mt-6 space-y-4">
               {navigation.community.map((item) => (
                 <li key={item.name}>
-                  <a href={item.href} className="text-sm leading-6 text-teal-100 hover:text-white transition-colors duration-200">
+                  <a href={item.href} className="text-sm leading-6 text-white hover:text-white transition-colors duration-200">
                     {item.name}
                   </a>
                 </li>
@@ -85,7 +85,7 @@ const Footer = () => {
             <ul role="list" className="mt-6 space-y-4">
               {navigation.wellness.map((item) => (
                 <li key={item.name}>
-                  <a href={item.href} className="text-sm leading-6 text-teal-100 hover:text-white transition-colors duration-200">
+                  <a href={item.href} className="text-sm leading-6 text-white hover:text-white transition-colors duration-200">
                     {item.name}
                   </a>
                 </li>
@@ -97,17 +97,17 @@ const Footer = () => {
 
         {/* Bottom Footer Bar */}
         <div className="mt-16 border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-xs leading-5 text-teal-200">
+          <p className="text-xs leading-5 text-white">
             &copy; 2025 Yoga For Nation. All rights reserved.
           </p>
           <div className="mt-4 sm:mt-0 flex space-x-6">
-            <a href="#" className="text-xs leading-5 text-teal-200 hover:text-white transition-colors duration-200">
+            <a href="#" className="text-xs leading-5 text-white hover:text-white transition-colors duration-200">
               Privacy Policy
             </a>
-            <a href="#" className="text-xs leading-5 text-teal-200 hover:text-white transition-colors duration-200">
+            <a href="#" className="text-xs leading-5 text-white hover:text-white transition-colors duration-200">
               Terms of Service
             </a>
-            <a href="#" className="text-xs leading-5 text-teal-200 hover:text-white transition-colors duration-200">
+            <a href="#" className="text-xs leading-5 text-white hover:text-white transition-colors duration-200">
               Support
             </a>
           </div>

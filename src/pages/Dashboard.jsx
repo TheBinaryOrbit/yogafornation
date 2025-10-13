@@ -469,8 +469,8 @@ export default function Dashboard() {
     if (classesAttended >= 250) return { title: "Yogacharya (योगाचार्य)", sanskrit: "योगाचार्य", classes: "250 classes", color: "bg-gradient-to-r from-blue-600 to-indigo-600" };
     if (classesAttended >= 180) return { title: "Yogaratna (योगरत्न)", sanskrit: "योगरत्न", classes: "180 days consistent", color: "bg-gradient-to-r from-cyan-600 to-blue-600" };
     if (classesAttended >= 100) return { title: "Yogapravar (योगप्रवर)", sanskrit: "योगप्रवर", classes: "100 classes", color: "bg-gradient-to-r from-teal-600 to-cyan-600" };
-    if (classesAttended >= 75) return { title: "Dhyanvi (ध्यानवी)", sanskrit: "ध्यानवी", classes: "75 classes", color: "bg-gradient-to-r from-green-600 to-teal-600" };
-    if (classesAttended >= 50) return { title: "Pranamitra (प्राणमित्र)", sanskrit: "प्राणमित्र", classes: "50 classes", color: "bg-gradient-to-r from-lime-600 to-green-600" };
+    if (classesAttended >= 75) return { title: "Dhyanvi (ध्यानवी)", sanskrit: "ध्यानवी", classes: "75 classes", color: "bg-gradient-to-r from-[#1D6F42] to-teal-600" };
+    if (classesAttended >= 50) return { title: "Pranamitra (प्राणमित्र)", sanskrit: "प्राणमित्र", classes: "50 classes", color: "bg-gradient-to-r from-lime-600 to-[#1D6F42]" };
     if (classesAttended >= 30) return { title: "Yogasarthi (योगार्थी)", sanskrit: "योगार्थी", classes: "30-40 classes", color: "bg-gradient-to-r from-yellow-600 to-lime-600" };
     if (classesAttended >= 10) return { title: "Abhyasi (अभ्यासी)", sanskrit: "अभ्यासी", classes: "10-25 classes", color: "bg-gradient-to-r from-orange-600 to-yellow-600" };
     if (classesAttended >= 5) return { title: "Sadhak (साधक)", sanskrit: "साधक", classes: "5-10 classes", color: "bg-gradient-to-r from-red-600 to-orange-600" };
@@ -513,7 +513,22 @@ export default function Dashboard() {
 
   const shareOnWhatsApp = () => {
     const referralLink = `https://yogafornation.com/register?refcode=${referralData?.my_referral_code || user?.uni_referral_code}`;
-    const message = `🧘‍♀️ Join me on Yoga For Nation! 🧘‍♂️\n\nTransform your life with daily yoga practice and earn karma points along the way!\n\n✨ Benefits:\n• Daily guided yoga sessions\n• Track your progress\n• Build healthy habits\n• Join a community of wellness enthusiasts\n\n🎁 Use my referral link to get started:\n${referralLink}\n\n#YogaForNation #Wellness #Mindfulness #Yoga`;
+
+    const message = `Day ${userProfile?.current_streak || 1} of my yoga journey! 🧘‍♂️
+
+💫 Current Stats:
+• Karma Points: ${userProfile?.karma_points || 0}
+• Longest Streak: ${userProfile?.longest_streak || 0} days
+• Total Classes: ${userProfile?.total_classes_attended || 0}
+
+🌟 Join me on Yoga For Nation and start your wellness journey!
+
+🔗 Register here: ${referralLink}
+
+Yoga For Nation
+स्वस्थ राष्ट्र का संकल्प
+
+#YogaForNation #swasthraashtrkasankalp`;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -522,8 +537,47 @@ export default function Dashboard() {
   const shareAsWhatsAppStatus = () => {
     const message = `🧘‍♀️ Day ${userProfile?.current_streak || 0} of my yoga journey! 🧘‍♂️\n\n💫 Current Stats:\n• Karma Points: ${userProfile?.karma_points || 0}\n• Longest Streak: ${userProfile?.longest_streak || 0} days\n• Total Classes: ${userProfile?.total_classes_attended || 0}\n\n🌟 Join me on Yoga For Nation and start your wellness journey!\n\nUse my code: ${referralData?.my_referral_code || user?.uni_referral_code}\n\n#YogaForNation #Wellness #YogaJourney #Mindfulness`;
 
-    // Copy to clipboard for status sharing
-    copyToClipboard(message, "Status message copied! Now paste it as your WhatsApp status.");
+    // Try modern share sheet first (best experience on mobile)
+    (async () => {
+      try {
+        if (navigator.share) {
+          await navigator.share({ text: message });
+          toast.success("Share sheet opened — choose WhatsApp and select 'My status' to post.", { position: "top-right", autoClose: 3000 });
+          return;
+        }
+
+        // If Web Share API not available, attempt WhatsApp app deep link (mobile)
+        const encoded = encodeURIComponent(message);
+        const appUrl = `whatsapp://send?text=${encoded}`;
+
+        // Attempt to open the WhatsApp app. On many mobile devices this will open the app
+        // where the user can paste into their status (or choose a contact). We open with _self
+        // so mobile browsers try to launch the native app.
+        try {
+          window.location.href = appUrl;
+
+          // As a gentle fallback in case the app link does nothing, open wa.me in a new tab after a short delay
+          setTimeout(() => {
+            window.open(`https://wa.me/?text=${encoded}`, "_blank");
+          }, 700);
+
+          // also copy to clipboard so users can easily paste into Status if needed
+          await copyToClipboard(message, "Status message copied! Now paste it into WhatsApp status.");
+          return;
+        } catch (err) {
+          // If opening the app link throws (rare), continue to final fallback
+          console.warn("WhatsApp app deep link failed, falling back to web share/clipboard", err);
+        }
+
+        // Final fallback: open wa.me (web) and copy to clipboard
+        window.open(`https://wa.me/?text=${encoded}`, "_blank");
+        await copyToClipboard(message, "Status message copied! Now paste it into WhatsApp status.");
+      } catch (error) {
+        console.error("Error sharing to WhatsApp status:", error);
+        // Last resort: copy to clipboard and show instructions
+        await copyToClipboard(message, "Status message copied! Now paste it into WhatsApp status.");
+      }
+    })();
   }
 
 
@@ -549,7 +603,7 @@ export default function Dashboard() {
     const day = String(date.getDate()).padStart(2, '0');
 
     // Combine into the desired format
-    return `YFN-${year}${month}${day}${id}`;
+    return `YFN${year}${month}${day}${id}`;
   }
 
 
@@ -564,7 +618,7 @@ export default function Dashboard() {
           {/* Current User Level Display */}
           {userProfile && (
             <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-              <h4 className="font-medium text-gray-800 mb-2">Your Yoga Journey</h4>
+              <h4 className="font-medium text-#2B2B2B mb-2">Your Yoga Journey</h4>
               {(() => {
                 const userLevel = getYogaLevel(parseInt(userProfile.total_classes_attended || 0));
                 const nextLevelThresholds = [5, 10, 30, 50, 75, 100, 180, 250, 365, 500];
@@ -604,7 +658,7 @@ export default function Dashboard() {
               })()}
             </div>
           )}
-          <h3 className="font-semibold text-gray-800 mb-4 text-xl my-10 text-center">🏆 Yoga Leaderboard</h3>
+          <h3 className="font-semibold text-#2B2B2B mb-4 text-xl my-10 text-center">🏆 Yoga Leaderboard</h3>
           {leaderboardLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -641,7 +695,7 @@ export default function Dashboard() {
                       </div>
 
                       <div>
-                        <p className={`font-medium ${isCurrentUser ? 'text-blue-800' : 'text-gray-800'}`}>
+                        <p className={`font-medium ${isCurrentUser ? 'text-blue-800' : 'text-#2B2B2B'}`}>
                           {user.name} {isCurrentUser ? '(You)' : ''}
                         </p>
                         <div className="flex items-center space-x-2">
@@ -656,7 +710,7 @@ export default function Dashboard() {
                     </div>
 
                     <div className="text-right">
-                      <p className="font-bold text-lg text-gray-800">
+                      <p className="font-bold text-lg text-#2B2B2B">
                         {user.total_classes_attended}
                       </p>
                       <p className="text-xs text-gray-500">classes</p>
@@ -692,12 +746,12 @@ export default function Dashboard() {
                     console.log("Back button clicked");
                     setShowRewards(false);
                   }}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  className="flex items-center gap-2 text-gray-600 hover:text-#2B2B2B transition-colors"
                 >
                   <ArrowLeft className="w-5 h-5" />
                   <span className="font-medium">Back</span>
                 </button>
-                <h1 className="text-lg font-bold text-gray-800">Your Rewards Journey</h1>
+                <h1 className="text-lg font-bold text-#2B2B2B">Your Rewards Journey</h1>
                 <div className="w-16"></div>
               </div>
             </div> */}
@@ -709,7 +763,7 @@ export default function Dashboard() {
                   <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Gift className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Your Rewards Journey</h2>
+                  <h2 className="text-2xl font-bold text-#2B2B2B mb-2">Your Rewards Journey</h2>
                   <p className="text-gray-600 text-sm leading-relaxed">
                     See your progress and unlock exclusive benefits as you help grow our movement.
                   </p>
@@ -723,7 +777,7 @@ export default function Dashboard() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-600">Friends get:</p>
-                      <p className="text-sm font-semibold text-green-600">Life-long access to free daily yoga classes</p>
+                      <p className="text-sm font-semibold text-[#1D6F42]">Life-long access to free daily yoga classes</p>
                     </div>
                   </div>
                 </div>
@@ -735,7 +789,7 @@ export default function Dashboard() {
 
               {/* Rewards Levels */}
               <div className="space-y-4">
-                <h3 className="text-lg font-bold text-gray-800 px-2">Levels & Rewards</h3>
+                <h3 className="text-lg font-bold text-#2B2B2B px-2">Levels & Rewards</h3>
 
                 {rewardsData.map((reward, index) => {
                   const isUnlocked = currentReferrals >= reward.invites;
@@ -832,7 +886,7 @@ export default function Dashboard() {
           {/* Referral Rewards Header */}
           <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">Referral Rewards</h2>
+              <h2 className="text-lg font-semibold text-#2B2B2B">Referral Rewards</h2>
               <button
                 onClick={() => {
                   console.log("View Rewards button clicked");
@@ -916,14 +970,14 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={shareAsWhatsAppStatus}
-                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors"
+                className="bg-[#1D6F42] hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors"
               >
                 <span>⭐</span>
                 WA Status
               </button>
               <button
                 onClick={shareOnWhatsApp}
-                className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors"
+                className="bg-[#1D6F42] hover:bg-green-700 text-white py-2 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-1 transition-colors"
               >
                 <Share className="w-4 h-4" />
                 Share On WhatsApp
@@ -942,7 +996,7 @@ export default function Dashboard() {
               </div>
               <div className="bg-green-50 p-4 rounded-lg">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{referralData.karma_from_referrals}</div>
+                  <div className="text-2xl font-bold text-[#1D6F42]">{referralData.karma_from_referrals}</div>
                   <div className="text-sm text-gray-600">Karma Earned</div>
                 </div>
               </div>
@@ -959,7 +1013,7 @@ export default function Dashboard() {
             </div>
           ) : referralData && referralData.referrals && referralData.referrals.length > 0 ? (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Your Referrals ({referralData.total_referrals})</h3>
+              <h3 className="text-lg font-semibold text-#2B2B2B mb-4">Your Referrals ({referralData.total_referrals})</h3>
               {referralData.referrals.map((referral) => (
                 <div key={referral.id} className="bg-white p-4 rounded-lg border shadow-sm">
                   <div className="flex items-center justify-between">
@@ -968,18 +1022,18 @@ export default function Dashboard() {
                         <User className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-800">{referral.name}</h4>
+                        <h4 className="font-semibold text-#2B2B2B">{referral.name}</h4>
                         <p className="text-sm text-gray-600">{referral.phone}</p>
                         <p className="text-xs text-gray-500">{referral.joined_date}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium text-gray-800">{referral.title}</div>
+                      <div className="text-sm font-medium text-#2B2B2B">{referral.title}</div>
                       <div className="text-xs text-gray-600">Streak: {referral.current_streak} days</div>
                       <div className="text-xs text-blue-600">{referral.karma_points} karma</div>
                       <span className={`inline-block px-2 py-1 rounded-full text-xs ${referral.status === 'active'
                         ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-gray-100 text-#2B2B2B'
                         }`}>
                         {referral.status}
                       </span>
@@ -990,7 +1044,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Your list of referrals will appear here.</h3>
+              <h3 className="text-lg font-semibold text-#2B2B2B mb-2">Your list of referrals will appear here.</h3>
               <p className="text-sm text-gray-600 mb-8">You Earn 100 Karma Point for every referral joining.</p>
 
               {/* Yoga Illustration */}
@@ -1017,7 +1071,7 @@ export default function Dashboard() {
           {/* Today's Instruction */}
           <div className="rounded-xl p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-green-600" />
+              <CheckCircle className="w-4 h-4 text-[#1D6F42]" />
               <p className="text-xs font-medium text-gray-600">
                 Today's Focus - {todayInstruction?.day_name || new Date().toLocaleDateString('en-US', { weekday: 'long' })}
               </p>
@@ -1043,7 +1097,7 @@ export default function Dashboard() {
         {/* Weekly Attendance Tracking */}
         <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
           <div className="text-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Weekly Attendance</h3>
+            <h3 className="text-lg font-semibold text-#2B2B2B">Weekly Attendance</h3>
             <p className="text-sm text-gray-600 italic">(Your Journey, Our Inspiration)</p>
           </div>
 
@@ -1129,7 +1183,7 @@ export default function Dashboard() {
               <div className="flex justify-around text-center space-x-4">
 
                 {/* Total Classes Attended */}
-                <div className="flex flex-col p-2  rounded-lg flex-1 bg-green-600 text-white">
+                <div className="flex flex-col p-2  rounded-lg flex-1 bg-[#1D6F42] text-white">
                   <span className="font-semibold text-2xl">
                     {userProfile?.total_classes_attended || 0}
                   </span>
@@ -1149,7 +1203,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Attendance Rate */}
-                <div className="flex flex-col p-2 bg-blue-600 rounded-lg flex-1 text-white">
+                <div className="flex flex-col p-2 bg-[#55B1D0] rounded-lg flex-1 text-white">
                   <span className="font-semibold text-2xl">
                     {weeklyAttendance.stats.weekly_attendance_rate?.toFixed(1) || 0.0}%
                   </span>
@@ -1168,15 +1222,15 @@ export default function Dashboard() {
               <div className="space-y-3 max-w-xs mx-auto">
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                   <span className="text-sm text-gray-600">Total Classes Attended:</span>
-                  <span className="font-semibold text-gray-800">0</span>
+                  <span className="font-semibold text-#2B2B2B">0</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                   <span className="text-sm text-gray-600">Current Streak:</span>
-                  <span className="font-semibold text-gray-800">0</span>
+                  <span className="font-semibold text-#2B2B2B">0</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                   <span className="text-sm text-gray-600">Attendance Rate:</span>
-                  <span className="font-semibold text-gray-800">0.0%</span>
+                  <span className="font-semibold text-#2B2B2B">0.0%</span>
                 </div>
               </div>
             </div>
@@ -1208,7 +1262,7 @@ export default function Dashboard() {
             {/* Right Side Button */}
             <button
               onClick={() => shareOnWhatsApp()}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
+              className="bg-purple-500 hover:bg-purple-600 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-md transition-colors"
             >
               Send Invite
             </button>
@@ -1221,7 +1275,7 @@ export default function Dashboard() {
 
         {/* Today's Classes */}
         <div className="mx-4 mb-6 bg-white rounded-lg p-4 shadow-sm">
-          <h3 className="font-semibold text-gray-800 mb-4">Today's Classes</h3>
+          <h3 className="font-semibold text-#2B2B2B mb-4">Today's Classes</h3>
 
           {classesLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -1279,14 +1333,14 @@ export default function Dashboard() {
                   <div key={cls.id} className="border rounded-lg p-3 bg-gray-50">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-800">{cls.title}</h4>
+                        <h4 className="font-semibold text-#2B2B2B">{cls.title}</h4>
                         <p className="text-sm text-gray-600">{cls.description}</p>
                       </div>
                       {/* <span className={`px-2 py-1 rounded-full text-xs font-medium ${cls.is_ongoing
                       ? 'bg-green-100 text-green-800'
                       : cls.is_upcoming_today
                         ? 'bg-blue-100 text-blue-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-gray-100 text-#2B2B2B'
                       }`}>
                       {cls.time_status}
                     </span> */}
@@ -1320,7 +1374,7 @@ export default function Dashboard() {
                           className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium text-sm transition-colors ${joiningClass === cls.id
                             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : cls.is_ongoing
-                              ? 'bg-green-600 text-white hover:bg-green-700'
+                              ? 'bg-[#1D6F42] text-white hover:bg-green-700'
                               : 'bg-blue-600 text-white hover:bg-blue-700'
                             }`}
                         >
@@ -1371,7 +1425,7 @@ export default function Dashboard() {
         <div className="mb-4"></div>
 
         {/* Join Telegram Community Card */}
-        <div className="mx-5 mb-6 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg p-6 shadow-sm">
+        <div className="mx-5 mb-6 bg-[#55B1D0] rounded-lg p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <h3 className="text-lg font-semibold text-white mb-2">Join Our Communities</h3>
@@ -1389,7 +1443,7 @@ export default function Dashboard() {
           <div className="flex justify-center items-center gap-4">
             <button
               onClick={() => window.open('https://t.me/yogafornation', '_blank')}
-              className="w-full bg-white text-blue-600 py-3 px-4 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-white text-[#55B1D0] py-3 px-4 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
@@ -1398,7 +1452,7 @@ export default function Dashboard() {
             </button>
             <button
               onClick={() => window.open('https://t.me/yogafornation', '_blank')}
-              className="w-full bg-white text-blue-600 py-3 px-4 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-white text-[#55B1D0] py-3 px-4 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
                 <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
@@ -1410,7 +1464,7 @@ export default function Dashboard() {
         </div>
 
         {/* Donation Card with QR Code */}
-        <div className="mx-5 mb-6 bg-gradient-to-r from-pink-500 to-rose-500 rounded-lg p-6 shadow-sm">
+        <div className="mx-5 mb-6 bg-[#E84F3D] rounded-lg p-6 shadow-sm">
           <div className="text-center">
             <h3 className="text-lg font-semibold text-white">Contribute to Our Mission</h3>
             <h3 className="text-md font-semibold text-white ">🙏Support via UPI</h3>
@@ -1429,7 +1483,7 @@ export default function Dashboard() {
             {/* Donate Button */}
             <button
               onClick={() => navigate('/donations')}
-              className="w-full bg-white text-pink-600 py-3 px-4 rounded-lg font-medium text-sm hover:bg-pink-50 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-white text-[#E84F3D] py-3 px-4 rounded-lg font-medium text-sm hover:bg-pink-50 transition-colors flex items-center justify-center gap-2"
             >
               <Heart className="w-4 h-4" />
               Donate to Support
@@ -1470,12 +1524,12 @@ export default function Dashboard() {
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-              <User className="w-6 h-6 text-green-600" />
+              <User className="w-6 h-6 text-[#1D6F42]" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800">{userProfile?.name || "Loading..."}</p>
+              <p className="font-semibold text-#2B2B2B">{userProfile?.name || "Loading..."}</p>
               {/* <p className="text-sm text-gray-500">{userProfile?.email || "No email"}</p> */}
-              <p className="text-sm text-gray-500">{`YNF-${userProfile?.id}` || "No user ID"}</p>
+              <p className="text-sm text-gray-500">{`YNF${userProfile?.id}` || "No user ID"}</p>
             </div>
           </div>
           <button
@@ -1573,14 +1627,17 @@ export default function Dashboard() {
             </button>
             <div onClick={() => navigate("/profile-edit")} className="cursor-pointer">
 
-              <p className="font-semibold text-gray-800">Namaste,{userProfile?.name || "Loading..."} Ji</p>
-              <p className="text-xs text-gray-900 font-semibold">ID-{formatUserId(userProfile?.created_at, userProfile?.id)}</p>
+              <p className="font-semibold text-#2B2B2B">{userProfile?.name || "Loading..."}</p>
+              <p className="text-xs text-gray-900 font-semibold">ID: {formatUserId(userProfile?.created_at, userProfile?.id)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold">{userProfile?.karma_points || 0}</span>
-            <span className="text-sm text-gray-600 ">Karma Points</span>
-            <LogOut className="w-6 h-6 p-1 ml-2.5 bg-red-200 text-red-600 rounded-sm cursor-pointer" onClick={handleLogout} />
+            <div className="flex flex-col items-end">
+              <span className="text-sm text-gray-600 ">Karma Points</span>
+              <span className="text-lg font-bold">{userProfile?.karma_points || 0}</span>
+            
+            </div>
+            <LogOut className="w-8 h-8 p-1.5 ml-2.5 bg-[#E84F3D] text-white rounded-sm cursor-pointer" onClick={handleLogout} />
           </div>
           {console.log(userProfile)}
 
@@ -1674,7 +1731,7 @@ function RatingModal({ open, onClose, onSubmit, classId }) {
         <button className="absolute top-2 right-2 p-1" onClick={handleClose}>
           <X className="w-5 h-5 text-gray-500" />
         </button>
-        <h3 className="text-lg font-semibold mb-2 text-gray-800">Rate This Class</h3>
+        <h3 className="text-lg font-semibold mb-2 text-#2B2B2B">Rate This Class</h3>
         <form onSubmit={handleSubmit}>
           <div className="flex items-center mb-3">
             {[1, 2, 3, 4, 5].map((star) => (

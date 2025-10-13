@@ -355,7 +355,7 @@ const Login = () => {
 
     return (
         <div className="min-h-screen">
-            <div className="min-h-screen  max-w-md mx-auto bg-gradient-to-br from-green-100 via-white to-blue-50">
+            <div className="min-h-screen  max-w-md mx-auto bg-gradient-to-br from-green-100 via-white to-white">
                 {/* Logo */}
                 <div className="text-center">
                     <img
@@ -368,11 +368,11 @@ const Login = () => {
                 {/* Main Heading */}
                 <div className="text-center">
 
-                    <h1 className="text-3xl font-bold text-green-700 mb-2">FREE ONLINE YOGA</h1>
+                    <h1 className="text-3xl font-bold text-[#1D6F42] mb-2">FREE ONLINE YOGA</h1>
                     <div className="flex items-center justify-center">
-                        <div className="w-6 h-0.5 bg-green-500 mr-2"></div>
+                        <div className="w-6 h-0.5 bg-[#1D6F42] mr-2"></div>
                         <p className="text-lg text-blue-600 font-medium">A Movement for a Healthier Nation</p>
-                        <div className="w-6 h-0.5 bg-green-500 ml-2"></div>
+                        <div className="w-6 h-0.5 bg-[#1D6F42] ml-2"></div>
                     </div>
                 </div>
 
@@ -392,7 +392,7 @@ const Login = () => {
                  [-webkit-mask-image:radial-gradient(circle,rgba(255,255,255,1)_70%,rgba(255,255,255,0)_100%)]
                  [mask-repeat:no-repeat] [mask-position:center] [mask-size:cover] pb-4">
                             <div className="text-center leading-none">
-                                <h2 className="text-green-700 font-bold uppercase tracking-wide text-2xl">
+                                <h2 className="text-[#1D6F42] font-bold uppercase tracking-wide text-2xl">
                                     Lovnish Gupta
                                 </h2>
                                 <p className="mt-1 text-slate-900 font-extrabold">
@@ -421,7 +421,7 @@ const Login = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                                        className="p-3 pl-12 pr-4  border border-gray-300 rounded-l-lg bg-gray-100 text-sm font-medium focus:ring-2 focus:ring-green-500 focus:border-green-500 min-w-[100px] flex items-center justify-between"
+                                        className="p-3 pl-12 pr-4  border border-gray-300 rounded-l-lg bg-gray-100 text-sm font-medium focus:ring-2 focus:ring-[#1D6F42] focus:border-[#1D6F42] min-w-[100px] flex items-center justify-between"
                                     >
                                         <span>{selectedCountry.dialCode}</span>
                                         <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -448,7 +448,7 @@ const Login = () => {
                                                     placeholder="Search by country code or name..."
                                                     value={countrySearchTerm}
                                                     onChange={handleCountrySearch}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#1D6F42] focus:border-[#1D6F42] text-sm"
                                                 />
                                             </div>
 
@@ -486,7 +486,7 @@ const Login = () => {
                                     placeholder="Enter Phone Number"
                                     value={formData.phonenumber}
                                     onChange={handleInputChange}
-                                    className="flex-1 block w-full pl-3 pr-3 py-2 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    className="flex-1 block w-full pl-3 pr-3 py-2 rounded-r-lg border border-gray-300 focus:ring-2 focus:ring-[#1D6F42] focus:border-[#1D6F42]"
                                     required
                                 />
                             </div>
@@ -504,17 +504,17 @@ const Login = () => {
                                 placeholder="Enter Your Password"
                                 value={formData.password}
                                 onChange={handleInputChange}
-                                className="block w-full pl-10 pr-10 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                className="block w-full pl-10 pr-10 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1D6F42] focus:border-[#1D6F42]"
                                 required
                             />
                             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 {showPassword ?
                                     <Eye
-                                        className="h-5 w-5 text-gray-400 cursor-pointer hover:text-green-500"
+                                        className="h-5 w-5 text-gray-400 cursor-pointer hover:text-[#1D6F42]"
                                         onClick={() => setShowPassword(false)}
                                     /> :
                                     <EyeOff
-                                        className="h-5 w-5 text-gray-400 cursor-pointer hover:text-green-500"
+                                        className="h-5 w-5 text-gray-400 cursor-pointer hover:text-[#1D6F42]"
                                         onClick={() => setShowPassword(true)}
                                     />
                                 }
@@ -523,7 +523,7 @@ const Login = () => {
 
                         {/* Forgot Password Link */}
                         <div className="text-right">
-                            <Link to="/forgot-password" className="text-sm text-green-600 hover:text-green-700">
+                            <Link to="/forgot-password" className="text-sm text-[#1D6F42] hover:text-[#1D6F42]">
                                 Forgot Password?
                             </Link>
                         </div>
@@ -532,7 +532,7 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            className="w-full bg-gradient-to-r from-[#1D6F42] to-[#1D6F42] hover:from-[#1D6F42] hover:to-[#1D6F42] text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {isLoading ? (
                                 <div className="flex items-center justify-center">
@@ -543,13 +543,13 @@ const Login = () => {
                                 "Click to join for free"
                             )}
                         </button>
-                        <p className="text-center text-green-500 font-semibold">Join the Thousands who have already started their journey with us.</p>
+                        <p className="text-center text-[#1D6F42] font-semibold">Join the Thousands who have already started their journey with us.</p>
 
                     </form>
 
                     {/* Sign Up Link */}
                     <div className="mt-2 text-center text-gray-600 border-t border-gray-100 pt-2">
-                        <p>Don't have an account? <Link to="/register" className="text-green-500 font-semibold hover:text-green-600">Sign up</Link></p>
+                        <p>Don't have an account? <Link to="/register" className="text-[#1D6F42] font-semibold hover:text-[#1D6F42]">Sign up</Link></p>
                     </div>
                 </div>
 

@@ -52,11 +52,12 @@ const MeetYourTrainer = () => {
     <section className="pt-12 pb-24 bg-white sm:pt-16 sm:pb-32">
       <div className="px-6 mx-auto max-w-7xl lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-base font-semibold leading-7 text-teal-600">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+           
             The Teacher Behind Our Movement
           </h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            A New Approach to Yoga
+          <p className="mt-2  text-base font-semibold leading-7 text-[#1D6F42] ">
+              A New Approach to Yoga           
           </p>
         </div>
         <div className="mt-16 space-y-20 lg:mt-24 lg:space-y-24 ">
@@ -69,12 +70,12 @@ const MeetYourTrainer = () => {
                   alt={`Trainer ${trainer.name}`}
                 />
               </div>
-              <p className='absolute bottom-0 text-2xl font-bold text-teal-600'>Lovnish Gupta CEO & Founder, Yoga for Nation</p>
+              <p className='absolute bottom-0 text-2xl font-bold text-[#1D6F42] '>Lovnish Gupta CEO & Founder, Yoga for Nation</p>
               <div>
                 <h3 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
                   {trainer.program} with {trainer.name}
                 </h3>
-                <h4 className="mt-2 text-lg font-semibold text-teal-600">
+                <h4 className="mt-2 text-lg font-semibold text-[#1D6F42] ">
                   {trainer.title}
                 </h4>
                 {trainer.stats && (
