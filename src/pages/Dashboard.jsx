@@ -1624,7 +1624,7 @@ export default function Dashboard() {
 
           <button
             onClick={() => setActiveTab("leaderboard")}
-            className={`flex flex-col items-center py-3 px-2 ${activeTab === "referral" ? "text-blue-600" : "text-gray-500"
+            className={`flex flex-col items-center py-3 px-2 ${activeTab === "leaderboard" ? "text-blue-600" : "text-gray-500"
               }`}
           >
             <AlignEndHorizontal className="w-5 h-5 mb-1" />
