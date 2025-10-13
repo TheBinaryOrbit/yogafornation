@@ -1,6 +1,6 @@
 import React from 'react';
 // Using your original logo import
-import logoImage from '../../assets/logoBgRemove.png';
+import logoImage from '../../assets/logo2.png';
 import { MapPin, Phone } from 'lucide-react';
 
 // Using your original navigation data, restructured for the new layout
@@ -43,18 +43,17 @@ const Footer = () => {
     // Replaced the gradient with a solid, calming dark teal color
     <footer className="bg-teal-700 text-white" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">Footer</h2>
-      <div className="mx-auto max-w-7xl px-6 py-16 sm:py-24 lg:px-8">
+      <div className="mx-auto max-w-7xl px-6 py-8 sm:py- lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
 
           {/* Column 1: Logo, Mission, and Social Links */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center space-x-3">
-              <img className="h-12 w-auto" src={logoImage} alt="Yoga For Nation" />
-              <span className="text-2xl font-bold">Yoga For Nation</span>
+              <img className="h-28 w-auto" src={logoImage} alt="Yoga For Nation" />
             </div>
             <div className='flex flex-col justify-start items-start gap-2 text-lg text-teal-200'>
               <p className='flex justify-center items-center'><MapPin className="h-5 w-5 text-teal-300" />&nbsp;Address: Delhi, India</p>
-              <p className='flex justify-center items-center'><Phone className="h-5 w-5 text-teal-300" />&nbsp;Phone: +91 12345 67890</p>
+              <p className='flex justify-center items-center'><Phone className="h-5 w-5 text-teal-300" />&nbsp;Phone: +91 92500 73500</p>
             </div>
             <div className="flex space-x-4 pt-2">
               {navigation.social.map((item) => (
@@ -99,7 +98,7 @@ const Footer = () => {
         {/* Bottom Footer Bar */}
         <div className="mt-16 border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-xs leading-5 text-teal-200">
-            &copy; 2025 Yoga For Nation. Building a healthier India, one breath at a time.
+            &copy; 2025 Yoga For Nation. All rights reserved.
           </p>
           <div className="mt-4 sm:mt-0 flex space-x-6">
             <a href="#" className="text-xs leading-5 text-teal-200 hover:text-white transition-colors duration-200">

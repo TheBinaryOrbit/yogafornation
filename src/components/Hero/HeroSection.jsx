@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo2.png";
 import yogaClassImage from "../../assets/hero-image.png";
 import avatar1 from "../../assets/avatar1.png";
 import avatar2 from "../../assets/avatar2.png";
@@ -62,9 +62,9 @@ const HeroSection = () => {
         <div className="relative z-10 text-center lg:text-left">
           {/* Header: Logo and new animated text */}
           <div className="flex items-center justify-center lg:justify-start gap-x-4">
-            <img className="w-auto h-14" src={logo} alt="Yoga Logo" />
+            <img className="w-auto h-24" src={logo} alt="Yoga Logo" />
             <span className="text-lg font-semibold text-blue-600 animate-pulse-once">
-              Yoga For a Nation
+             
             </span>
           </div>
 

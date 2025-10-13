@@ -8,6 +8,7 @@ import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import useGetuser from "../hooks/user"
 import loginImage from "../assets/login.png"
+import logo from "../assets/logo2.png"
 
 const Login = () => {
     const user = useGetuser();
@@ -358,7 +359,7 @@ const Login = () => {
                 {/* Logo */}
                 <div className="text-center">
                     <img
-                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/png-logo-j9moV4DkAQHKCtbAK5mKGOyrYzxFGO.png"
+                        src={logo}
                         alt="Yoga For Nation Logo"
                         className="h-40 mx-auto drop-shadow-md"
                     />
