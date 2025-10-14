@@ -1145,17 +1145,19 @@ Yoga For Nation
                     return (
                       <div
                         key={day.date}
-                        className={`p-3 rounded-lg relative ${day.status === "attended"
+                        className={`px-3 py-1 rounded-lg relative ${day.status === "attended"
                           ? "bg-green-500 text-white"
                           : day.status === "not_attended"
                             ? "bg-gray-100 text-gray-600"
                             : "bg-gray-100 text-gray-600"
                           } ${isToday ? "ring-2 ring-blue-400" : ""}`}
                         title={`${day.day_name} - ${day.status === "attended" ? `${day.attendance_count} class(es)` : "No classes"}`}
-                      >
+                      > 
+                      
                         <div className="font-medium">{dayNum}</div>
+                        
                         {day.attendance_count > 0 && (
-                          <div className="text-xs mt-1">{day.attendance_count}</div>
+                          <div className="text-xs mt-1 flex flex-col"><span>✅</span><span>{day.attendance_count}</span></div>
                         )}
                       </div>
                     );
@@ -1188,12 +1190,12 @@ Yoga For Nation
                     {userProfile?.total_classes_attended || 0}
                   </span>
                   <span className="text-sm font-semibold mt-1">
-                    Total Classes
+                    Total Days
                   </span>
                 </div>
 
                 {/* Current Streak */}
-                <div className="flex flex-col p-2 bg-yellow-400 rounded-lg flex-1 text-white">
+                <div className="flex flex-col p-2 bg-[#E84F3D] rounded-lg flex-1 text-white">
                   <span className="font-semibold text-2xl">
                     {userProfile?.current_streak || 0}
                   </span>

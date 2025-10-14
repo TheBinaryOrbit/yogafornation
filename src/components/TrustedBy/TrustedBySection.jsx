@@ -1,4 +1,7 @@
 import React from 'react';
+import avatar1 from '../../assets/Sangeeta.png';
+import avatar2 from '../../assets/Rohan.png';
+import avatar3 from '../../assets/Priya.png';
 
 // Testimonials data
 const testimonials = [
@@ -8,7 +11,7 @@ const testimonials = [
     achievement: 'Reduced Stress',
     days: '105 Yoga Days',
     quote: 'I used to struggle with daily stress and anxiety. The breathing exercises in the free classes have helped me find inner peace. Now I feel calm and balanced every day, and it\'s all because of this movement.',
-    avatar: 'https://t4.ftcdn.net/jpg/04/59/85/07/360_F_459850779_582p4mR7RTtvBFavIZlcpADdgLzeYlyo.jpg'
+    avatar:  avatar1 
   },
   {
     name: 'Rohan Verma',
@@ -16,7 +19,7 @@ const testimonials = [
     achievement: 'Improved Mobility',
     days: '60 Yoga Days',
     quote: 'Chronic back pain was a major problem for me. After just two months of consistent practice, my mobility has significantly improved, and the pain is almost gone. These classes are truly transformative.',
-    avatar: 'https://plus.unsplash.com/premium_photo-1671656349322-41de944d259b?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZmFjZXN8ZW58MHx8MHx8fDA%3D'
+    avatar: avatar2
   },
   {
     name: 'Priya Joshi',
@@ -24,7 +27,7 @@ const testimonials = [
     achievement: '8 kg Weight Loss',
     days: '120 Yoga Days',
     quote: 'I had always wanted to lose weight but lacked the motivation. Yoga for Nation gave me a supportive community and classes I love. I\'ve not only lost 8 kg but also built a habit that has changed my life for good.',
-    avatar: 'https://thumbs.dreamstime.com/b/face-young-happy-indian-businesswoman-smiling-face-young-happy-indian-businesswoman-smiling-isolated-against-white-128979240.jpg'
+    avatar: avatar3
   }
 ];
 
@@ -52,7 +55,7 @@ const TestimonialsSection = () => {
                   <img src={testimonial.avatar} alt={testimonial.name} className="w-16 h-16 rounded-2xl object-cover" />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between">
                     <h3 className="font-semibold text-gray-900">{testimonial.name}</h3>
                   </div>
                   <div className="text-sm text-gray-600">

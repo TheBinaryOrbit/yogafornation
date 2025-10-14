@@ -279,19 +279,19 @@ const Login = () => {
     }, [user, navigate])
 
     // Handle click outside to close dropdown
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (showCountryDropdown && !event.target.closest('.country-dropdown')) {
-                setShowCountryDropdown(false)
-                setCountrySearchTerm("")
+        useEffect(() => {
+            const handleClickOutside = (event) => {
+                if (showCountryDropdown && !event.target.closest('.country-dropdown')) {
+                    setShowCountryDropdown(false)
+                    setCountrySearchTerm("")
+                }
             }
-        }
 
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside)
-        }
-    }, [showCountryDropdown])
+            document.addEventListener('mousedown', handleClickOutside)
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside)
+            }
+        }, [showCountryDropdown])
 
     const handleInputChange = (e) => {
         setFormData({
