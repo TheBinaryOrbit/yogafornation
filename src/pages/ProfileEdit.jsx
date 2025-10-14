@@ -23,7 +23,8 @@ const ProfileEdit = () => {
         birtyear: "",
         email: "",
         primarygoal: "",
-        phonenumber: ""
+        phonenumber: "",
+        createdAt:""
     });
 
     const [selectedCountry, setSelectedCountry] = useState({
@@ -353,6 +354,7 @@ const ProfileEdit = () => {
 
             if (response.data.success) {
                 const userData = response.data.user;
+                console.log(response.data.user)
                 setFormData({
                     user_id: userData.id,
                     name: userData.name || "",
@@ -361,7 +363,8 @@ const ProfileEdit = () => {
                     birtyear: formatDateForInput(userData.birtyear) || "",
                     email: userData.email || "",
                     primarygoal: userData.primarygoal || "",
-                    phonenumber: userData.phonenumber || ""
+                    phonenumber: userData.phonenumber || "",
+                    createdAt: userData.created_at || ""
                 });
 
                 // Update localStorage with fresh user data
@@ -454,6 +457,20 @@ const ProfileEdit = () => {
         "Overall health"
     ];
 
+    const formatUserId = (createdAt, id) => {
+    // Convert string date to JS Date object
+    const date = new Date(createdAt);
+
+    // Extract last 2 digits of year
+    const year = String(date.getFullYear()).slice(-2);
+    // Month and date with zero padding
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    // Combine into the desired format
+    return `YFN${year}${month}${day}${id}`;
+  }
+
     return (
         <div className="min-h-screen max-w-md mx-auto">
             {/* Enhanced Header */}
@@ -470,7 +487,7 @@ const ProfileEdit = () => {
                         <h1 className="text-xl font-bold text-gray-800">
                             Edit Profile
                         </h1>
-                        <p className="text-xs text-gray-500 mt-1">Update your personal information</p>
+                        <p className="text-xs text-gray-500 mt-1">{formatUserId(formData.createdAt, formData.user_id)}</p>
                     </div>
                     <div className="w-16"></div>
                 </div>
