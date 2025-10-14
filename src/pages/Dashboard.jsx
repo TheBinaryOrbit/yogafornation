@@ -523,12 +523,7 @@ export default function Dashboard() {
 
 🌟 Join me on Yoga For Nation and start your wellness journey!
 
-🔗 Register here: ${referralLink}
-
-Yoga For Nation
-स्वस्थ राष्ट्र का संकल्प
-
-#YogaForNation #swasthraashtrkasankalp`;
+🔗 Register here: ${referralLink}`;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
